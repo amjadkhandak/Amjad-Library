@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amjad Library — Luxury 3D Digital Archive</title>
+    <title>Amjad Library Pro Max — 3D Luxury Digital Archive</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-    <!-- Three.js Library for 3D Background Canvas -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+    <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -23,72 +30,107 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                        mono: ['Fira Code', 'monospace'],
                     },
                     colors: {
+                        obsidian: '#05070A',
                         charcoal: {
-                            950: '#07090D',
-                            900: '#0B0D11',
-                            850: '#11151F',
-                            800: '#181E2C',
-                            700: '#242C3F',
+                            950: '#070A0F',
+                            900: '#0E131F',
+                            850: '#141C2E',
+                            800: '#1C273E',
+                            700: '#2A3A5B',
                         },
                         champagne: {
-                            100: '#FAF3E0',
+                            100: '#FFF6E5',
+                            200: '#F5E3BD',
                             300: '#E5C384',
                             400: '#D4AF37',
-                            500: '#C59B27',
+                            500: '#B88E2B',
+                            600: '#8C6719',
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
+        :root {
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
         body {
-            background-color: #07090D;
+            background-color: #05070A;
             color: #E2E8F0;
             overflow-x: hidden;
         }
-        
-        .glass-card {
-            background: rgba(17, 21, 31, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transform-style: preserve-3d;
-            transition: transform 0.15s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .glass-card:hover {
-            border-color: rgba(212, 175, 55, 0.4);
-            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15);
-        }
 
-        .card-glare {
-            position: absolute;
+        /* Custom Spotlight Ambient Glow */
+        #mouseSpotlight {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(212, 175, 55, 0.07), transparent 80%);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Glassmorphism Ultra Cards */
+        .glass-card {
+            background: rgba(14, 19, 31, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.45);
+            box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+        }
+
+        /* Card Specular Glare */
+        .card-glare {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--card-mouse-x, 50%) var(--card-mouse-y, 50%), rgba(255, 255, 255, 0.15) 0%, transparent 65%);
             pointer-events: none;
             border-radius: inherit;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 5;
         }
 
         .glass-card:hover .card-glare {
             opacity: 1;
         }
 
+        /* Gold Gradient Typography */
         .gold-gradient-text {
-            background: linear-gradient(135deg, #FFF0D0 0%, #E5C384 50%, #B88E2B 100%);
+            background: linear-gradient(135deg, #FFF6E5 0%, #E5C384 45%, #D4AF37 70%, #997A15 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .hero-glow {
-            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.15) 0%, rgba(7, 9, 13, 0) 70%);
+        /* Reader Theme Presets */
+        .reader-theme-dark {
+            background-color: #0B0F17 !important;
+            color: #CBD5E1 !important;
+        }
+        .reader-theme-sepia {
+            background-color: #1A1612 !important;
+            color: #E2D1B3 !important;
+        }
+        .reader-theme-midnight {
+            background-color: #050B14 !important;
+            color: #94A3B8 !important;
         }
 
         /* Custom Scrollbar */
@@ -97,11 +139,12 @@
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #07090D;
+            background: #05070A;
         }
         ::-webkit-scrollbar-thumb {
-            background: #242C3F;
+            background: #1C273E;
             border-radius: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #D4AF37;
@@ -114,32 +157,60 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* Pulsing Glow Animation */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 6s infinite ease-in-out;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-champagne-400 selection:text-charcoal-950 font-sans relative">
+<body class="min-h-screen flex flex-col justify-between selection:bg-champagne-400 selection:text-obsidian font-sans relative">
 
-    <!-- Ambient Glow Top Background -->
-    <div class="fixed top-0 left-0 right-0 h-[600px] hero-glow pointer-events-none z-0"></div>
+    <!-- Ambient Mouse Following Spotlight -->
+    <div id="mouseSpotlight"></div>
 
-    <!-- Navigation Header -->
-    <header class="sticky top-0 z-40 bg-charcoal-950/85 backdrop-blur-md border-b border-white/10 transition-colors">
+    <!-- Glowing Background Spheres -->
+    <div class="fixed top-[-10%] left-[20%] w-[500px] h-[500px] bg-champagne-400/10 rounded-full blur-[140px] pointer-events-none z-0 animate-pulse-glow"></div>
+    <div class="fixed bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[160px] pointer-events-none z-0"></div>
+
+    <!-- Sticky Navigation Header -->
+    <header class="sticky top-0 z-40 bg-obsidian/85 backdrop-blur-xl border-b border-white/10 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-3.5 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-champagne-500 via-champagne-300 to-amber-100 flex items-center justify-center text-charcoal-950 shadow-lg shadow-champagne-500/20">
-                    <i class="fa-solid fa-compass text-lg"></i>
+            
+            <!-- Brand Logo with Magnetic Hover -->
+            <div class="flex items-center space-x-3.5 cursor-pointer magnetic-item" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-champagne-500 via-champagne-300 to-amber-100 flex items-center justify-center text-obsidian shadow-lg shadow-champagne-500/25 border border-champagne-300/40 transform transition-transform duration-300 hover:scale-105">
+                    <i class="fa-solid fa-cube text-xl"></i>
                 </div>
                 <div>
-                    <span class="font-serif text-xl font-bold tracking-wider gold-gradient-text">AMJAD ARCHIVE</span>
-                    <p class="text-[10px] tracking-widest text-slate-400 uppercase font-medium">3D Digital Collection</p>
+                    <span class="font-serif text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text">AMJAD ARCHIVE</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[9px] tracking-[0.2em] text-champagne-300/80 uppercase font-mono">3D PRO MAX EDITION</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Header Action Controls -->
-            <div class="flex items-center space-x-4">
-                <button onclick="openUploadModal()" class="flex items-center space-x-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-champagne-400 to-champagne-500 hover:from-champagne-300 hover:to-champagne-400 text-charcoal-950 font-semibold text-xs tracking-wide shadow-lg shadow-champagne-400/20 hover:shadow-champagne-400/30 active:scale-95 transition-all duration-300">
-                    <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
-                    <span>Upload Book</span>
+            <!-- Header Quick Meter & Actions -->
+            <div class="flex items-center space-x-4 sm:space-x-6">
+                <!-- Storage Gauge Badge -->
+                <div class="hidden md:flex items-center space-x-3 px-4 py-2 rounded-2xl bg-charcoal-900/80 border border-white/10 text-xs font-mono">
+                    <i class="fa-solid fa-hard-drive text-champagne-400"></i>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase tracking-wider">Local Vault</div>
+                        <div class="text-champagne-300 font-bold" id="headerStorageMeter">0.0 MB / 5 MB</div>
+                    </div>
+                </div>
+
+                <!-- Upload CTA Button -->
+                <button onclick="openUploadModal()" class="magnetic-item group relative px-6 py-2.5 rounded-2xl bg-gradient-to-r from-champagne-400 via-champagne-300 to-amber-200 text-obsidian font-bold text-xs tracking-wide shadow-xl shadow-champagne-400/20 hover:shadow-champagne-400/40 active:scale-95 transition-all duration-300 overflow-hidden flex items-center space-x-2">
+                    <span class="absolute inset-0 bg-white/30 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
+                    <i class="fa-solid fa-cloud-arrow-up text-xs relative z-10"></i>
+                    <span class="relative z-10">+ Upload Book</span>
                 </button>
             </div>
         </div>
@@ -148,100 +219,171 @@
     <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full relative z-10">
 
-        <!-- 1. CATEGORY FILTERS (POSITIONED ABOVE HERO BANNER) -->
-        <div class="mb-8 p-3 glass-card rounded-2xl flex items-center justify-between gap-4 overflow-x-auto no-scrollbar border border-champagne-400/20 shadow-xl" id="categoryFilterContainer">
-            <div class="flex items-center space-x-2">
-                <button onclick="setCategory('All')" class="category-btn active px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-charcoal-950 shadow-md shadow-champagne-400/20" data-category="All">All Works</button>
-                <button onclick="setCategory('Literature')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Literature">Literature</button>
-                <button onclick="setCategory('Philosophy')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Philosophy">Philosophy</button>
-                <button onclick="setCategory('Technology')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Technology">Technology</button>
-                <button onclick="setCategory('Science')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Science">Science</button>
-                <button onclick="setCategory('Art & Design')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Art & Design">Art & Design</button>
-                <button onclick="setCategory('Business')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Business">Business</button>
-                <button onclick="setCategory('History')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="History">History</button>
+        <!-- 1. CATEGORY NAVIGATION BAR (PLACED PROMINENTLY ABOVE HERO SECTION) -->
+        <nav class="mb-8 p-3 glass-card rounded-2xl flex items-center justify-between gap-4 overflow-x-auto no-scrollbar border border-champagne-400/20 shadow-2xl relative z-20" id="categoryFilterContainer">
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="setCategory('All')" class="category-btn active px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-obsidian shadow-lg shadow-champagne-400/25 flex items-center space-x-2" data-category="All">
+                    <i class="fa-solid fa-border-all text-xs"></i>
+                    <span>All Works</span>
+                </button>
+                <button onclick="setCategory('Literature')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Literature">Literature</button>
+                <button onclick="setCategory('Philosophy')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Philosophy">Philosophy</button>
+                <button onclick="setCategory('Technology')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Technology">Technology</button>
+                <button onclick="setCategory('Science')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Science">Science</button>
+                <button onclick="setCategory('Art & Design')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Art & Design">Art & Design</button>
+                <button onclick="setCategory('Business')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Business">Business</button>
+                <button onclick="setCategory('History')" class="category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="History">History</button>
             </div>
-            <div id="bookCounter" class="text-xs text-slate-400 font-mono hidden sm:block px-3 border-l border-white/10">
-                Total: <span id="countNum" class="text-champagne-300 font-bold">0</span> works
+            
+            <div class="text-xs text-slate-400 font-mono hidden lg:flex items-center space-x-2 px-4 border-l border-white/10">
+                <i class="fa-solid fa-layer-group text-champagne-400"></i>
+                <span>Showing: <strong id="countNum" class="text-champagne-300 font-bold">0</strong> Items</span>
             </div>
-        </div>
+        </nav>
 
-        <!-- 2. EDITORIAL HERO BANNER WITH INTERACTIVE 3D THREE.JS CANVAS -->
-        <section class="relative rounded-3xl overflow-hidden mb-12 border border-white/10 glass-card p-8 sm:p-12 lg:p-16 min-h-[380px] flex items-center shadow-2xl">
+        <!-- 2. EDITORIAL HERO SECTION WITH HEAVY 3D THREE.JS INTERACTIVE CANVAS -->
+        <section class="relative rounded-3xl overflow-hidden mb-12 border border-white/10 glass-card p-8 sm:p-12 lg:p-16 min-h-[440px] flex items-center shadow-2xl group">
             <!-- Three.js Canvas Container -->
-            <div id="hero3dCanvasContainer" class="absolute inset-0 z-0 opacity-80 pointer-events-none"></div>
+            <div id="hero3dCanvasContainer" class="absolute inset-0 z-0 opacity-85 pointer-events-none transition-opacity duration-700"></div>
 
-            <!-- Foreground Content -->
-            <div class="relative z-10 max-w-2xl">
-                <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-champagne-400/10 border border-champagne-400/30 text-champagne-300 text-xs font-medium mb-5 backdrop-blur-md">
+            <!-- Foreground Content with 3D Depth Shift -->
+            <div class="relative z-10 max-w-2xl" id="heroTextContainer">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-champagne-400/10 border border-champagne-400/30 text-champagne-300 text-xs font-medium mb-6 backdrop-blur-md">
                     <span class="w-2 h-2 rounded-full bg-champagne-400 animate-ping"></span>
-                    <span class="tracking-widest uppercase">Private Knowledge Reserve</span>
+                    <span class="tracking-widest uppercase font-mono">Private Knowledge Reserve Pro</span>
                 </div>
-                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-                    Step into <br><span class="italic font-normal gold-gradient-text">curated wisdom.</span>
+
+                <h1 class="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1] mb-6">
+                    Archive of <br>
+                    <span class="italic font-normal gold-gradient-text">Timeless Genius.</span>
                 </h1>
-                <p class="mt-4 text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-xl">
-                    Discover, read, and download your personal repository of digital books, research papers, and rare documents with instant 3D interactive preview capabilities.
+
+                <p class="text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-xl mb-8">
+                    Discover, preview, and download your personal private vault of literature, technical manuals, and rare research papers with instant 3D interactive previewing.
                 </p>
 
                 <!-- Search Bar -->
-                <div class="mt-8 flex flex-col sm:flex-row items-center gap-3">
-                    <div class="relative w-full">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-champagne-400 text-sm"></i>
-                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search library by title, author, or category..." 
-                            class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-charcoal-900/90 border border-white/10 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-champagne-400/60 focus:ring-1 focus:ring-champagne-400/60 text-xs sm:text-sm transition-all duration-300">
-                    </div>
+                <div class="relative max-w-lg">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-champagne-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search archive by title, author, or keyword..." 
+                        class="w-full pl-12 pr-12 py-4 rounded-2xl bg-charcoal-950/80 border border-white/15 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-champagne-400 focus:ring-1 focus:ring-champagne-400 text-xs sm:text-sm transition-all duration-300 backdrop-blur-md">
+                    <button onclick="document.getElementById('searchInput').value=''; handleSearch();" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition">
+                        <i class="fa-solid fa-circle-xmark text-xs"></i>
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- 3. BOOKS GRID -->
+        <!-- 3. BENTO GRID ANALYTICS & DASHBOARD HIGHLIGHTS -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Bento Card 1: Total Works Count -->
+            <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-l-4 border-l-champagne-400">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Total Works</span>
+                    <div class="w-10 h-10 rounded-xl bg-champagne-400/10 text-champagne-400 flex items-center justify-center border border-champagne-400/20">
+                        <i class="fa-solid fa-book-bookmark text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="font-serif text-3xl font-bold text-white mb-1" id="bentoTotalCount">0</div>
+                    <p class="text-[11px] text-slate-400">Indexed in local browser vault</p>
+                </div>
+            </div>
+
+            <!-- Bento Card 2: Vault Storage Meter -->
+            <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-l-4 border-l-emerald-400">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Storage Allocated</span>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-400/10 text-emerald-400 flex items-center justify-center border border-emerald-400/20">
+                        <i class="fa-solid fa-database text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="font-serif text-2xl font-bold text-white mb-2" id="bentoStorageVal">0.00 KB</div>
+                    <!-- Storage Bar -->
+                    <div class="w-full h-2 rounded-full bg-charcoal-800 overflow-hidden border border-white/5">
+                        <div id="storageProgressBar" class="h-full bg-gradient-to-r from-emerald-500 to-champagne-400 w-0 transition-all duration-700"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Card 3: Rare Reserve Spotlight -->
+            <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-l-4 border-l-amber-400">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Featured Reserve</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30">RARE</span>
+                </div>
+                <div class="my-2">
+                    <h4 class="font-serif text-base font-bold text-white line-clamp-1" id="bentoFeaturedTitle">The Art of War</h4>
+                    <p class="text-xs text-slate-400" id="bentoFeaturedAuthor">by Sun Tzu</p>
+                </div>
+                <button onclick="openFeaturedBook()" class="text-xs text-champagne-300 font-semibold flex items-center gap-2 hover:underline">
+                    <span>Explore Spotlight</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- Bento Card 4: Reading Progress & Categories -->
+            <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-l-4 border-l-blue-400">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Active Categories</span>
+                    <div class="w-10 h-10 rounded-xl bg-blue-400/10 text-blue-400 flex items-center justify-center border border-blue-400/20">
+                        <i class="fa-solid fa-shapes text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="font-serif text-3xl font-bold text-white mb-1" id="bentoCategoryCount">7</div>
+                    <p class="text-[11px] text-slate-400">Curated subjects available</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. BOOKS 3D CARDS GRID -->
         <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Dynamic Cards injected via JS with 3D Tilt Effect -->
+            <!-- Dynamic Cards with 3D Parallax Tilt injected via JavaScript -->
         </div>
 
-        <!-- Empty State Message -->
-        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center glass-card rounded-3xl my-8">
-            <div class="w-16 h-16 rounded-full bg-charcoal-800 flex items-center justify-center text-champagne-400 text-2xl mb-4 border border-white/10">
-                <i class="fa-solid fa-book-bookmark"></i>
+        <!-- Empty State Fallback -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center glass-card rounded-3xl my-8 border border-white/10">
+            <div class="w-20 h-20 rounded-3xl bg-charcoal-900/90 flex items-center justify-center text-champagne-400 text-3xl mb-4 border border-champagne-400/30 shadow-xl">
+                <i class="fa-solid fa-book-open text-champagne-400"></i>
             </div>
-            <h3 class="font-serif text-xl font-semibold text-white">No books found</h3>
-            <p class="text-xs text-slate-400 mt-1 max-w-sm">No items matched your criteria. You can upload a new book to your offline local storage archive anytime.</p>
-            <button onclick="openUploadModal()" class="mt-5 px-5 py-2.5 rounded-full bg-champagne-400 hover:bg-champagne-300 text-charcoal-950 text-xs font-bold transition">
-                + Upload Book Now
+            <h3 class="font-serif text-2xl font-bold text-white mb-1">No items found in archive</h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mb-6">No works matched your exact search or category filter. You can add new books to your local offline vault anytime.</p>
+            <button onclick="openUploadModal()" class="px-6 py-3 rounded-2xl bg-champagne-400 hover:bg-champagne-300 text-obsidian text-xs font-bold transition-all shadow-lg shadow-champagne-400/20">
+                + Add Book to Archive
             </button>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-white/10 py-8 bg-charcoal-950 text-center text-xs text-slate-500 relative z-10 mt-12">
+    <footer class="border-t border-white/10 py-10 bg-obsidian text-center text-xs text-slate-500 relative z-10 mt-16">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-2">
-                <span class="font-serif font-bold text-slate-300">AMJAD DIGITAL ARCHIVE</span>
-                <span class="text-slate-600">•</span>
-                <span>Local Storage Persistence Engine</span>
+            <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 rounded-lg bg-champagne-400 text-obsidian flex items-center justify-center font-bold font-serif text-xs">A</div>
+                <span class="font-serif font-bold text-slate-300 tracking-wider">AMJAD DIGITAL ARCHIVE PRO MAX</span>
             </div>
             <p>&copy; <span id="currentYear"></span> Amjad Dakhna. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Upload Book Modal -->
-    <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-charcoal-950/80 backdrop-blur-md transition-opacity duration-300">
+    <!-- UPLOAD BOOK MODAL -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-obsidian/85 backdrop-blur-xl transition-opacity duration-300">
         <div class="glass-card rounded-3xl max-w-lg w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto border border-champagne-400/30 shadow-2xl" id="uploadModalCard">
-            <!-- Modal Header -->
+            
             <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
                 <div>
-                    <h3 class="font-serif text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up text-champagne-400 text-lg"></i>
-                        Upload Book to Archive
+                    <h3 class="font-serif text-xl font-bold text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-cloud-arrow-up text-champagne-400"></i>
+                        <span>Upload Book to Archive</span>
                     </h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Files are stored securely in your browser's LocalStorage</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Files are stored securely in local browser storage</p>
                 </div>
-                <button onclick="closeUploadModal()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition">
+                <button onclick="closeUploadModal()" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Form -->
             <form id="uploadForm" onsubmit="handleFormUpload(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Book Title *</label>
@@ -270,7 +412,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Cover Image Source</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Cover Source</label>
                         <select id="coverType" onchange="toggleCoverInput()" class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
                             <option value="url">Image Web URL</option>
                             <option value="file">Upload File from Device</option>
@@ -278,40 +420,36 @@
                     </div>
                 </div>
 
-                <!-- Cover Input: URL -->
                 <div id="coverUrlContainer">
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Cover Image URL</label>
                     <input type="url" id="bookCoverUrl" placeholder="https://images.unsplash.com/..." 
                         class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white placeholder-slate-600 text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
                 </div>
 
-                <!-- Cover Input: File -->
                 <div id="coverFileContainer" class="hidden">
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Select Image File</label>
                     <input type="file" id="bookCoverFile" accept="image/*" 
                         class="w-full px-3 py-2 rounded-xl bg-charcoal-900 border border-white/10 text-slate-400 text-xs focus:outline-none file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-champagne-400/20 file:text-champagne-300 hover:file:bg-champagne-400/30">
                 </div>
 
-                <!-- Book Document Attachment -->
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Attach Book Document (PDF or TXT) *</label>
-                    <div class="p-4 rounded-2xl bg-charcoal-900/80 border border-dashed border-champagne-400/40 text-center hover:border-champagne-400 transition">
-                        <i class="fa-solid fa-file-pdf text-champagne-400 text-2xl mb-2"></i>
-                        <input type="file" id="bookFile" accept=".pdf,.txt,.doc" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-champagne-400 file:text-charcoal-950 hover:file:bg-champagne-300 cursor-pointer">
-                        <p class="text-[10px] text-slate-500 mt-2">Converts to Base64 & saved in your browser LocalStorage.</p>
+                    <div class="p-5 rounded-2xl bg-charcoal-900/80 border border-dashed border-champagne-400/40 text-center hover:border-champagne-400 transition cursor-pointer">
+                        <i class="fa-solid fa-file-pdf text-champagne-400 text-3xl mb-2"></i>
+                        <input type="file" id="bookFile" accept=".pdf,.txt,.doc" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-champagne-400 file:text-obsidian hover:file:bg-champagne-300 cursor-pointer">
+                        <p class="text-[10px] text-slate-500 mt-2">Converts to Base64 & stored in browser LocalStorage</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Short Synopsis</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Synopsis / Overview</label>
                     <textarea id="bookDesc" rows="3" placeholder="Brief summary of the book content..." 
                         class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white placeholder-slate-600 text-xs sm:text-sm focus:outline-none focus:border-champagne-400 resize-none"></textarea>
                 </div>
 
-                <!-- Modal Form Buttons -->
                 <div class="flex items-center justify-end space-x-3 pt-4 border-t border-white/10">
-                    <button type="button" onclick="closeUploadModal()" class="px-5 py-2.5 rounded-full border border-white/10 text-slate-300 text-xs font-semibold hover:bg-white/5 transition">Cancel</button>
-                    <button type="submit" id="saveBookBtn" class="px-6 py-2.5 rounded-full bg-champagne-400 hover:bg-champagne-300 text-charcoal-950 text-xs font-bold tracking-wide shadow-lg shadow-champagne-400/20 transition flex items-center gap-2">
+                    <button type="button" onclick="closeUploadModal()" class="px-5 py-2.5 rounded-xl border border-white/10 text-slate-300 text-xs font-semibold hover:bg-white/5 transition">Cancel</button>
+                    <button type="submit" id="saveBookBtn" class="px-6 py-2.5 rounded-xl bg-champagne-400 hover:bg-champagne-300 text-obsidian text-xs font-bold tracking-wide shadow-lg shadow-champagne-400/20 transition flex items-center gap-2">
                         <span>Save to Archive</span>
                     </button>
                 </div>
@@ -319,57 +457,77 @@
         </div>
     </div>
 
-    <!-- Book Reader & Details View Modal -->
-    <div id="readerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-charcoal-950/90 backdrop-blur-lg transition-opacity duration-300">
-        <div class="glass-card rounded-3xl max-w-4xl w-full h-[90vh] flex flex-col border border-champagne-400/30 overflow-hidden shadow-2xl relative">
-            <!-- Reader Modal Header -->
-            <div class="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between bg-charcoal-900/60">
-                <div class="flex items-center space-x-4">
+    <!-- IN-APP BOOK READER / VIEWER MODAL (UI/UX PRO MAX FEATURE) -->
+    <div id="readerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-6 bg-obsidian/90 backdrop-blur-2xl transition-opacity duration-300">
+        <div class="glass-card rounded-3xl max-w-5xl w-full h-[92vh] flex flex-col border border-champagne-400/40 overflow-hidden shadow-2xl relative">
+            
+            <!-- Modal Header with Reader Controls -->
+            <div class="p-4 sm:p-5 border-b border-white/10 flex flex-wrap items-center justify-between bg-charcoal-950/80 gap-3">
+                <div class="flex items-center space-x-3">
                     <div id="readerCategoryBadge" class="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-champagne-400/20 text-champagne-300 border border-champagne-400/30">
                         Category
                     </div>
                     <div>
-                        <h2 id="readerTitle" class="font-serif text-lg sm:text-xl font-bold text-white line-clamp-1">Book Title</h2>
+                        <h2 id="readerTitle" class="font-serif text-base sm:text-lg font-bold text-white line-clamp-1">Book Title</h2>
                         <p id="readerAuthor" class="text-xs text-slate-400">by Author</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="modalDownloadBtn" class="px-4 py-2 rounded-full bg-champagne-400 hover:bg-champagne-300 text-charcoal-950 text-xs font-bold flex items-center gap-2 transition">
-                        <i class="fa-solid fa-download"></i>
-                        <span class="hidden sm:inline">Download File</span>
+
+                <!-- Custom Reader Customization Tools -->
+                <div class="flex items-center space-x-2 bg-charcoal-900 p-1.5 rounded-2xl border border-white/10">
+                    <!-- Font Size decrease/increase -->
+                    <button onclick="adjustReaderFontSize(-2)" title="Decrease Font" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition flex items-center justify-center">A-</button>
+                    <span id="readerFontSizeVal" class="text-xs font-mono px-1 text-champagne-300">14px</span>
+                    <button onclick="adjustReaderFontSize(2)" title="Increase Font" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition flex items-center justify-center">A+</button>
+
+                    <div class="w-px h-5 bg-white/10 my-auto mx-1"></div>
+
+                    <!-- Theme Switcher -->
+                    <button onclick="setReaderTheme('dark')" title="Dark Mode" class="w-7 h-7 rounded-lg bg-obsidian border border-white/20 text-xs text-slate-300 flex items-center justify-center">🌙</button>
+                    <button onclick="setReaderTheme('sepia')" title="Sepia Warm Mode" class="w-7 h-7 rounded-lg bg-[#1A1612] border border-amber-500/30 text-xs text-amber-200 flex items-center justify-center">📜</button>
+                    <button onclick="setReaderTheme('midnight')" title="Midnight Mode" class="w-7 h-7 rounded-lg bg-[#050B14] border border-blue-500/30 text-xs text-blue-200 flex items-center justify-center">🌌</button>
+
+                    <div class="w-px h-5 bg-white/10 my-auto mx-1"></div>
+
+                    <button id="modalDownloadBtn" class="px-3 py-1.5 rounded-xl bg-champagne-400 hover:bg-champagne-300 text-obsidian text-xs font-bold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-download text-xs"></i>
+                        <span class="hidden sm:inline">Download</span>
                     </button>
-                    <button onclick="closeReaderModal()" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition">
-                        <i class="fa-solid fa-xmark text-base"></i>
+
+                    <button onclick="closeReaderModal()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-red-500/20 text-slate-300 hover:text-red-400 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-sm"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Reader Modal Body -->
+            <!-- Modal Content Body -->
             <div class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-6" id="readerContainer">
-                <!-- Book Overview & Content Preview -->
-                <div class="flex flex-col sm:flex-row gap-6 items-start bg-charcoal-900/40 p-5 rounded-2xl border border-white/5">
-                    <img id="readerCover" src="" alt="Book Cover" class="w-28 h-40 object-cover rounded-xl shadow-md border border-white/10 flex-shrink-0">
+                
+                <!-- Book Overview Header -->
+                <div class="flex flex-col sm:flex-row gap-5 items-start bg-charcoal-900/50 p-5 rounded-2xl border border-white/5">
+                    <img id="readerCover" src="" alt="Book Cover" class="w-24 h-36 object-cover rounded-xl shadow-lg border border-white/10 flex-shrink-0">
                     <div class="flex-1">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-champagne-400 mb-1">Synopsis & Overview</h4>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-champagne-400 mb-1">Synopsis & Metadata</h4>
                         <p id="readerDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">Description here...</p>
                     </div>
                 </div>
 
-                <!-- Interactive Viewer Box -->
-                <div class="flex-1 rounded-2xl border border-white/10 bg-charcoal-950 overflow-hidden flex flex-col min-h-[350px]">
-                    <div class="px-4 py-2.5 bg-charcoal-900/80 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between">
-                        <span><i class="fa-solid fa-file-lines text-champagne-400 mr-2"></i> Document Viewer</span>
-                        <span id="readerFileName" class="text-[10px] text-slate-500">file.pdf</span>
+                <!-- Reading Canvas Box -->
+                <div class="flex-1 rounded-2xl border border-white/10 bg-obsidian overflow-hidden flex flex-col min-h-[380px]" id="readerCanvasWrapper">
+                    <div class="px-4 py-2.5 bg-charcoal-950/90 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between">
+                        <span><i class="fa-solid fa-book-open text-champagne-400 mr-2"></i> In-App Reader Canvas</span>
+                        <span id="readerFileName" class="text-[10px] text-slate-500">file.txt</span>
                     </div>
-                    <div id="viewerContent" class="flex-1 p-4 overflow-auto flex items-center justify-center">
-                        <!-- Rendered PDF iframe or text box injected here -->
+
+                    <div id="viewerContent" class="flex-1 p-6 overflow-auto flex items-start justify-center reader-theme-dark transition-colors duration-300">
+                        <!-- Content rendered here dynamically -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Notification Toast -->
+    <!-- Notification Toast Popup -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center space-x-3 px-5 py-3.5 rounded-2xl bg-charcoal-850 border border-champagne-400/40 text-white shadow-2xl text-xs font-medium">
         <i id="toastIcon" class="fa-solid fa-circle-check text-champagne-400 text-base"></i>
         <span id="toastMessage">Notification message</span>
@@ -377,18 +535,18 @@
 
     <!-- Application Scripting -->
     <script>
-        // 7 Rich Pre-Loaded Sample Books Data
+        // 7 Rich Initial Pre-loaded Sample Books Data with Readable Content
         const initialBooks = [
             {
                 id: '1',
                 title: 'The Art of War',
                 author: 'Sun Tzu',
                 category: 'Philosophy',
-                description: 'An ancient Chinese military treatise attributed to Sun Tzu. The work consists of 13 chapters, each devoted to one aspect of warfare and strategic decision making.',
+                description: 'An ancient Chinese military treatise attributed to Sun Tzu. The work consists of 13 chapters, each devoted to one aspect of strategic decision making.',
                 cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',
                 fileName: 'Art_Of_War_Sun_Tzu.txt',
                 fileType: 'text/plain',
-                fileData: 'data:text/plain;base64,VEhFCiBBUlQgT0YgV0FSCgpieSBTdW4gVHp1CgoxLiBMQVlJTkcgUExBTlMKU3VuIFR6dSBzYWlkOiBUaGUgYXJ0IG9mIHdhciBpcyBvZiB2aXRhbCBpbXBvcnRhbmNlIHRvIHRoZSBTdGF0ZS4gSXQgaXMgYSBtYXR0ZXIgb2YgbGlmZSBhbmQgZGVhdGgsIGEgcm9hZCBlaXRoZXIgdG8gc2FmdHkgb3IgdG8gcnVpbi4gSGVuY2UgaXQgaXMgYSBzdHVkeSB3aGljaCBjYW4gb24gbm8gYWNjb3VudCBiZSBuZWdsZWN0ZWQu'
+                fileData: 'data:text/plain;base64,VEhFCiBBUlQgT0YgV0FSCgpieSBTdW4gVHp1CgoxLiBMQVlJTkcgUExBTlMKU3VuIFR6dSBzYWlkOiBUaGUgYXJ0IG9mIHdhciBpcyBvZiB2aXRhbCBpbXBvcnRhbmNlIHRvIHRoZSBTdGF0ZS4gSXQgaXMgYSBtYXR0ZXIgb2YgbGlmZSBhbmQgZGVhdGgsIGEgcm9hZCBlaXRoZXIgdG8gc2FmdHkgb3IgdG8gcnVpbi4gSGVuY2UgaXQgaXMgYSBzdHVkeSB3aGljaCBjYW4gb24gbm8gYWNjb3VudCBiZSBuZWdsZWN0ZWQuCgoyLiBXQUdJTkcgV0FSCkluIHRoZSBvcGVyYXRpb25zIG9mIHdhciwgd2hlcmUgdGhlcmUgYXJlIGluIHRoZSBmaWVsZCBhIHRob3VzYW5kIHN3aWZ0IGNoYXJpb3RzLCBhcyBtYW55IGhlYXZ5IGNoYXJpb3RzLCBhbmQgYW4gaHVuZHJlZCB0aG91c2FuZCBtYWlsLWNvYXRlZCBzb2xkaWVycywgd2l0aCBzdXBwbGllcyBlbm91Z2ggdG8gY2FycnkgdGhlbSBhIHRob3VzYW5kIGxpLCB0aGUgZXhwZW5kaXR1cmUgYXQgaG9tZSBhbmQgYXQgdGhlIGZyb250IHdpbGwgcmVhY2ggdGhlIHN1bSBvZiBhIHRob3VzYW5kIG91bmNlcyBvZiBzaWx2ZXIgcGVyIGRheS4='
             },
             {
                 id: '2',
@@ -399,18 +557,18 @@
                 cover: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=600&q=80',
                 fileName: 'Meditations_Marcus_Aurelius.txt',
                 fileType: 'text/plain',
-                fileData: 'data:text/plain;base64,TUVESVRBVElPTlMKQnkgTWFyY3VzIEF1cmVsaXVzCgpCT09LIE9ORQoxLiBGcm9tIG15IGdyYW5kZmF0aGVyIFZlcnVzIEkgbGVhcm5lZCBnb29kIG1vcmFscyBhbmQgdGhlIGdvdmVybm1lbnQgb2YgbXkgdGVtcGVyLgoyLiBGcm9tIHRoZSByZXB1dGF0aW9uIGFuZCByZW1lbWJyYW5jZSBvZiBteSBiZWdldHRlcg==='
+                fileData: 'data:text/plain;base64,TUVESVRBVElPTlMKQnkgTWFyY3VzIEF1cmVsaXVzCgpCT09LIE9ORQoxLiBGcm9tIG15IGdyYW5kZmF0aGVyIFZlcnVzIEkgbGVhcm5lZCBnb29kIG1vcmFscyBhbmQgdGhlIGdvdmVybm1lbnQgb2YgbXkgdGVtcGVyLgoyLiBGcm9tIHRoZSByZXB1dGF0aW9uIGFuZCByZW1lbWJyYW5jZSBvZiBteSBiZWdldHRlciwgIHBpZXR5IGFuZCBtYW5saW5lc3MuCjMuIEZyb20gbXkgbW90aGVyLCBwaWV0eSBhbmQgYmVuZWZpY2VuY2UsIGFuZCBhYnN0aW5lbmNlLCBub3Qgb25seSBmcm9tIGV2aWwgYWN0aW9ucywgYnV0IGV2ZW4gZnJvbSBldmlsIHRob3VnaHRzL'
             },
             {
                 id: '3',
-                title: 'Digital Systems & Design',
+                title: 'Digital Systems & Design Architecture',
                 author: 'Amjad Dakhna',
                 category: 'Technology',
                 description: 'An architectural exploration into modern web application engineering, microservices compilation workflows, and dark digital aesthetic paradigms.',
                 cover: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80',
                 fileName: 'Digital_Systems_Design.txt',
                 fileType: 'text/plain',
-                fileData: 'data:text/plain;base64,RElHSVRBTCAgU1lTVEVNUyAmIERFU0lHTgpCeSBBbWphZCBEYWtobmEKCkNIQVBURVIgMTogVEhFIExVTlRBTiBBRVNUSEVUSUMKTW9kZXJuIHdlYiBhcHBsaWNhdGlvbnMgcmVxdWlyZSBhbGlnbm1lbnQgYmV0d2VlbiBmdW5jdGlvbmFsaXR5IGFuZCB2aXN1YWwgZ3JhY2Uu'
+                fileData: 'data:text/plain;base64,RElHSVRBTCAgU1lTVEVNUyAmIERFU0lHTgpCeSBBbWphZCBEYWtobmEKCkNIQVBURVIgMTogVEhFIExVTlRBTiBBRVNUSEVUSUMKTW9kZXJuIHdlYiBhcHBsaWNhdGlvbnMgcmVxdWlyZSBhbGlnbm1lbnQgYmV0d2VlbiBmdW5jdGlvbmFsaXR5IGFuZCB2aXN1YWwgZ3JhY2UuIFRocmVlLmpzIDNEIGdyYXBoaWNzLCBHU0FQIGFuaW1hdGlvbnMsIGFuZCBUYWlsd2luZCBDU1MgY29tYmluZSB0byBmb3JtIGhpZ2gtY29udmVydGluZyB2aXN1YWwgYXJjaGl0ZWN0dXJlcy4='
             },
             {
                 id: '4',
@@ -458,90 +616,119 @@
             }
         ];
 
-        // Global State
+        // Application State
         let books = [];
         let currentCategory = 'All';
         let searchQuery = '';
         let activeBookForReader = null;
+        let readerFontSize = 14;
 
-        // On Load
+        // Init on Window Load
         window.onload = function() {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
+            setupMouseSpotlight();
             initThreeJsHero();
             loadBooksFromStorage();
             render();
+            initGSAPAnimations();
         };
 
-        // 3D Three.js Hero Canvas Scene Setup
+        // Mouse Spotlight Tracking
+        function setupMouseSpotlight() {
+            window.addEventListener('mousemove', (e) => {
+                document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+                document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+            });
+        }
+
+        // Heavy 3D Three.js Hero Scene with Hardcover Books & Floating Particles
         function initThreeJsHero() {
             const container = document.getElementById('hero3dCanvasContainer');
             if (!container || typeof THREE === 'undefined') return;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 8;
+            camera.position.set(0, 0, 9);
 
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            // Floating 3D Gold Geometries (Books & Polyhedra)
             const objectsGroup = new THREE.Group();
             scene.add(objectsGroup);
 
-            // Materials
-            const goldMaterial = new THREE.MeshStandardMaterial({
-                color: 0xD4AF37,
-                metalness: 0.8,
-                roughness: 0.25,
-                wireframe: false
-            });
+            // 1. Create 3D Realistic Hardcover Books
+            const bookGoldMat = new THREE.MeshStandardMaterial({ color: 0xD4AF37, metalness: 0.85, roughness: 0.2 });
+            const bookDarkMat = new THREE.MeshStandardMaterial({ color: 0x141C2E, metalness: 0.3, roughness: 0.4 });
+            const bookPagesMat = new THREE.MeshStandardMaterial({ color: 0xFFF6E5, roughness: 0.9 });
 
-            const glassMaterial = new THREE.MeshStandardMaterial({
-                color: 0x181E2C,
-                metalness: 0.3,
-                roughness: 0.4,
-                wireframe: true
-            });
+            for (let i = 0; i < 6; i++) {
+                const bookGroup = new THREE.Group();
 
-            // Geometry 1: Floating Book Shapes
-            for (let i = 0; i < 5; i++) {
-                const bookGeo = new THREE.BoxGeometry(1.2, 1.6, 0.25);
-                const bookMesh = new THREE.Mesh(bookGeo, goldMaterial);
-                bookMesh.position.set((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 3);
-                bookMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-                objectsGroup.add(bookMesh);
+                // Cover Box
+                const coverGeo = new THREE.BoxGeometry(1.3, 1.8, 0.22);
+                const coverMesh = new THREE.Mesh(coverGeo, i % 2 === 0 ? bookGoldMat : bookDarkMat);
+                bookGroup.add(coverMesh);
+
+                // Internal Pages Block
+                const pagesGeo = new THREE.BoxGeometry(1.22, 1.72, 0.18);
+                const pagesMesh = new THREE.Mesh(pagesGeo, bookPagesMat);
+                pagesMesh.position.x = 0.03;
+                bookGroup.add(pagesMesh);
+
+                // Position randomly
+                bookGroup.position.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 4);
+                bookGroup.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * 0.5);
+                
+                objectsGroup.add(bookGroup);
             }
 
-            // Geometry 2: Floating Polyhedra Shapes
-            for (let i = 0; i < 6; i++) {
-                const polyGeo = i % 2 === 0 ? new THREE.IcosahedronGeometry(0.5, 0) : new THREE.OctahedronGeometry(0.6, 0);
-                const polyMesh = new THREE.Mesh(polyGeo, glassMaterial);
-                polyMesh.position.set((Math.random() - 0.5) * 9, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 4);
+            // 2. Floating Gold Polyhedra (Octahedrons & Icosahedrons)
+            const polyMat = new THREE.MeshStandardMaterial({ color: 0xE5C384, wireframe: true });
+            for (let i = 0; i < 8; i++) {
+                const polyGeo = i % 2 === 0 ? new THREE.IcosahedronGeometry(0.4, 0) : new THREE.OctahedronGeometry(0.5, 0);
+                const polyMesh = new THREE.Mesh(polyGeo, polyMat);
+                polyMesh.position.set((Math.random() - 0.5) * 12, (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 5);
                 objectsGroup.add(polyMesh);
             }
 
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            // 3. Ambient Star / Gold Dust Particle Field
+            const particleCount = 400;
+            const particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 18;
+                positions[i+1] = (Math.random() - 0.5) * 10;
+                positions[i+2] = (Math.random() - 0.5) * 8;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMat = new THREE.PointsMaterial({ size: 0.04, color: 0xD4AF37, transparent: true, opacity: 0.6 });
+            const particleSystem = new THREE.Points(particleGeo, particleMat);
+            scene.add(particleSystem);
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
 
-            const pointLight = new THREE.PointLight(0xD4AF37, 2, 50);
-            pointLight.position.set(5, 5, 5);
+            const pointLight = new THREE.PointLight(0xD4AF37, 2.5, 50);
+            pointLight.position.set(6, 6, 6);
             scene.add(pointLight);
 
-            const pointLight2 = new THREE.PointLight(0xE5C384, 1.5, 50);
-            pointLight2.position.set(-5, -5, 2);
-            scene.add(pointLight2);
+            const blueLight = new THREE.PointLight(0x3B82F6, 1.5, 50);
+            blueLight.position.set(-6, -6, 2);
+            scene.add(blueLight);
 
-            // Mouse interaction
-            let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth - 0.5) * 0.8;
-                mouseY = (e.clientY / window.innerHeight - 0.5) * 0.8;
+            // Interactive Parallax
+            let targetX = 0, targetY = 0;
+            window.addEventListener('mousemove', (e) => {
+                targetX = (e.clientX / window.innerWidth - 0.5) * 0.9;
+                targetY = (e.clientY / window.innerHeight - 0.5) * 0.9;
             });
 
-            // Window Resize listener
+            // Window Resize handle
             window.addEventListener('resize', () => {
                 if (!container) return;
                 camera.aspect = container.clientWidth / container.clientHeight;
@@ -553,17 +740,18 @@
             function animate() {
                 requestAnimationFrame(animate);
 
-                // Smooth rotation & Mouse reaction
-                objectsGroup.rotation.y += 0.003;
-                objectsGroup.rotation.x += (mouseY - objectsGroup.rotation.x) * 0.05;
-                objectsGroup.rotation.y += (mouseX - objectsGroup.rotation.y) * 0.05;
+                // Smooth rotation & Mouse camera parallax
+                objectsGroup.rotation.y += 0.002;
+                objectsGroup.rotation.x += (targetY - objectsGroup.rotation.x) * 0.04;
+                objectsGroup.rotation.y += (targetX - objectsGroup.rotation.y) * 0.04;
 
-                // Subtle floating wave effect
+                particleSystem.rotation.y -= 0.0005;
+
                 const time = Date.now() * 0.001;
                 objectsGroup.children.forEach((child, idx) => {
-                    child.position.y += Math.sin(time + idx) * 0.002;
+                    child.position.y += Math.sin(time + idx) * 0.0015;
                     child.rotation.x += 0.002;
-                    child.rotation.y += 0.003;
+                    child.rotation.y += 0.002;
                 });
 
                 renderer.render(scene, camera);
@@ -572,9 +760,9 @@
             animate();
         }
 
-        // LocalStorage Loader
+        // LocalStorage Management
         function loadBooksFromStorage() {
-            const stored = localStorage.getItem('amjad_luxury_library_books');
+            const stored = localStorage.getItem('amjad_luxury_library_books_v2');
             if (stored) {
                 try {
                     books = JSON.parse(stored);
@@ -585,17 +773,34 @@
                 books = [...initialBooks];
                 saveBooksToStorage();
             }
+            updateStorageMetrics();
         }
 
         function saveBooksToStorage() {
             try {
-                localStorage.setItem('amjad_luxury_library_books', JSON.stringify(books));
+                localStorage.setItem('amjad_luxury_library_books_v2', JSON.stringify(books));
             } catch (e) {
                 showToast('Storage quota exceeded! Please remove some large files.', 'error');
             }
+            updateStorageMetrics();
         }
 
-        // Render Cards with 3D Physics Tilt Effect
+        function updateStorageMetrics() {
+            const raw = localStorage.getItem('amjad_luxury_library_books_v2') || '';
+            const bytes = new Blob([raw]).size;
+            const kb = (bytes / 1024).toFixed(1);
+            const mb = (bytes / (1024 * 1024)).toFixed(2);
+
+            const displayStr = bytes > 1024 * 1024 ? `${mb} MB` : `${kb} KB`;
+            document.getElementById('headerStorageMeter').textContent = `${displayStr} / 5 MB`;
+            document.getElementById('bentoStorageVal').textContent = displayStr;
+
+            // Storage Gauge Percentage
+            const pct = Math.min((bytes / (5 * 1024 * 1024)) * 100, 100);
+            document.getElementById('storageProgressBar').style.width = `${Math.max(pct, 5)}%`;
+        }
+
+        // Render Cards with 3D Tilt & Specular Glare
         function render() {
             const booksGrid = document.getElementById('booksGrid');
             const emptyState = document.getElementById('emptyState');
@@ -610,6 +815,7 @@
             });
 
             countNum.textContent = filteredBooks.length;
+            document.getElementById('bentoTotalCount').textContent = books.length;
 
             if (filteredBooks.length === 0) {
                 booksGrid.innerHTML = '';
@@ -626,27 +832,27 @@
                 const coverUrl = book.cover && book.cover.trim() !== '' ? book.cover : defaultImage;
 
                 return `
-                    <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between group relative cursor-pointer" 
+                    <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group relative cursor-pointer" 
                          onmousemove="handleCardTilt(event, this)" 
                          onmouseleave="resetCardTilt(this)">
                         
                         <div class="card-glare"></div>
 
-                        <!-- Book Cover Image -->
-                        <div class="relative h-64 overflow-hidden bg-charcoal-900 border-b border-white/5">
+                        <!-- Book Cover Image Box -->
+                        <div class="relative h-64 overflow-hidden bg-charcoal-950 border-b border-white/5">
                             <img src="${coverUrl}" alt="${escapeHtml(book.title)}" 
                                 onerror="this.src='${defaultImage}'"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/20 to-transparent"></div>
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                            <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/30 to-transparent"></div>
                             
-                            <!-- Category Badge -->
-                            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-charcoal-950/80 text-champagne-300 border border-champagne-400/30 backdrop-blur-md">
+                            <!-- Category Pill -->
+                            <span class="absolute top-3 left-3 px-3.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-charcoal-950/80 text-champagne-300 border border-champagne-400/30 backdrop-blur-md">
                                 ${escapeHtml(book.category)}
                             </span>
                         </div>
 
-                        <!-- Card Body -->
-                        <div class="p-5 flex-1 flex flex-col justify-between relative z-10">
+                        <!-- Card Body Details -->
+                        <div class="p-6 flex-1 flex flex-col justify-between relative z-10">
                             <div>
                                 <h3 class="font-serif font-bold text-white text-lg line-clamp-1 group-hover:text-champagne-300 transition-colors">
                                     ${escapeHtml(book.title)}
@@ -659,21 +865,21 @@
                                 </p>
                             </div>
 
-                            <!-- Card Actions -->
-                            <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between gap-2">
+                            <!-- Card Action Controls -->
+                            <div class="pt-4 mt-5 border-t border-white/10 flex items-center justify-between gap-2">
                                 <button onclick="openReaderModal('${book.id}')" 
-                                    class="flex-1 py-2 px-3 rounded-full bg-champagne-400/10 hover:bg-champagne-400 text-champagne-300 hover:text-charcoal-950 border border-champagne-400/30 text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md">
+                                    class="flex-1 py-2.5 px-3 rounded-2xl bg-champagne-400/10 hover:bg-champagne-400 text-champagne-300 hover:text-obsidian border border-champagne-400/30 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-md">
                                     <i class="fa-solid fa-eye text-xs"></i>
-                                    <span>View / Read</span>
+                                    <span>Read / View</span>
                                 </button>
 
                                 <button onclick="downloadBookFile('${book.id}')" title="Download Document"
-                                    class="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-champagne-300 transition-colors border border-white/5">
+                                    class="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-champagne-300 transition-colors border border-white/5">
                                     <i class="fa-solid fa-download text-xs"></i>
                                 </button>
 
                                 <button onclick="deleteBook('${book.id}')" title="Delete Book" 
-                                    class="p-2 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors border border-white/5">
+                                    class="p-2.5 rounded-2xl bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors border border-white/5">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                             </div>
@@ -683,7 +889,7 @@
             }).join('');
         }
 
-        // 3D Tilt Card Movement Calculations
+        // Interactive 3D Physics Card Tilt
         function handleCardTilt(e, card) {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -692,20 +898,20 @@
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
 
-            const rotateX = ((y - centerY) / centerY) * -10;
-            const rotateY = ((x - centerX) / centerX) * 10;
+            const rotateX = ((y - centerY) / centerY) * -12;
+            const rotateY = ((x - centerX) / centerX) * 12;
 
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
 
-            card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-            card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+            card.style.setProperty('--card-mouse-x', `${(x / rect.width) * 100}%`);
+            card.style.setProperty('--card-mouse-y', `${(y / rect.height) * 100}%`);
         }
 
         function resetCardTilt(card) {
             card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
         }
 
-        // Search
+        // Search Engine Trigger
         function handleSearch() {
             searchQuery = document.getElementById('searchInput').value;
             render();
@@ -717,15 +923,15 @@
             const buttons = document.querySelectorAll('.category-btn');
             buttons.forEach(btn => {
                 if (btn.getAttribute('data-category') === category) {
-                    btn.className = 'category-btn active px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-charcoal-950 shadow-md shadow-champagne-400/20';
+                    btn.className = 'category-btn active px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-obsidian shadow-lg shadow-champagne-400/25 flex items-center space-x-2';
                 } else {
-                    btn.className = 'category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40';
+                    btn.className = 'category-btn px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900/80 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40';
                 }
             });
             render();
         }
 
-        // Modal Controls
+        // In-App Reader Controls
         function openReaderModal(id) {
             const book = books.find(b => b.id === id);
             if (!book) return;
@@ -748,17 +954,31 @@
                 } else {
                     try {
                         const base64Content = book.fileData.split(',')[1];
-                        const text = atob(base64Content);
-                        viewerContent.innerHTML = `<pre class="w-full h-full min-h-[350px] p-4 text-xs sm:text-sm text-slate-300 font-mono whitespace-pre-wrap leading-relaxed select-text">${escapeHtml(text)}</pre>`;
+                        const text = decodeURIComponent(escape(atob(base64Content)));
+                        viewerContent.innerHTML = `<pre class="w-full h-full p-2 text-slate-300 font-mono whitespace-pre-wrap leading-relaxed select-text" style="font-size: ${readerFontSize}px;" id="readerTextPre">${escapeHtml(text)}</pre>`;
                     } catch (e) {
                         viewerContent.innerHTML = `<iframe src="${book.fileData}" class="w-full h-full min-h-[450px] rounded-xl border border-white/10"></iframe>`;
                     }
                 }
             } else {
-                viewerContent.innerHTML = `<div class="text-center text-slate-500 text-xs py-12">No readable file data attached for this book.</div>`;
+                viewerContent.innerHTML = `<div class="text-center text-slate-500 text-xs py-16">No readable file data attached for this book.</div>`;
             }
 
             document.getElementById('readerModal').classList.remove('hidden');
+        }
+
+        function adjustReaderFontSize(delta) {
+            readerFontSize = Math.max(10, Math.min(28, readerFontSize + delta));
+            document.getElementById('readerFontSizeVal').textContent = `${readerFontSize}px`;
+            const textPre = document.getElementById('readerTextPre');
+            if (textPre) {
+                textPre.style.fontSize = `${readerFontSize}px`;
+            }
+        }
+
+        function setReaderTheme(theme) {
+            const viewerContent = document.getElementById('viewerContent');
+            viewerContent.className = `flex-1 p-6 overflow-auto flex items-start justify-center transition-colors duration-300 reader-theme-${theme}`;
         }
 
         function closeReaderModal() {
@@ -766,6 +986,7 @@
             document.getElementById('viewerContent').innerHTML = '';
         }
 
+        // Download Book
         function downloadBookFile(id) {
             const book = books.find(b => b.id === id);
             if (!book || !book.fileData) {
@@ -783,6 +1004,7 @@
             showToast(`Downloading "${book.title}"...`);
         }
 
+        // Delete Book
         function deleteBook(id) {
             const book = books.find(b => b.id === id);
             if (!book) return;
@@ -793,6 +1015,7 @@
             showToast(`Deleted "${book.title}" from library.`);
         }
 
+        // Form Upload Handler
         async function handleFormUpload(e) {
             e.preventDefault();
 
@@ -837,7 +1060,7 @@
             render();
             closeUploadModal();
             document.getElementById('uploadForm').reset();
-            showToast(`Successfully uploaded "${title}" to archive!`);
+            showToast(`Successfully added "${title}" to archive!`);
         }
 
         function readFileAsBase64(file) {
@@ -847,6 +1070,12 @@
                 reader.onerror = error => reject(error);
                 reader.readAsDataURL(file);
             });
+        }
+
+        function openFeaturedBook() {
+            if (books.length > 0) {
+                openReaderModal(books[0].id);
+            }
         }
 
         function toggleCoverInput() {
@@ -866,6 +1095,32 @@
 
         function closeUploadModal() {
             document.getElementById('uploadModal').classList.add('hidden');
+        }
+
+        // GSAP Animations Engine
+        function initGSAPAnimations() {
+            if (typeof gsap === 'undefined') return;
+
+            // Fade in Hero content
+            gsap.from('#heroTextContainer', {
+                opacity: 0,
+                y: 30,
+                duration: 1.2,
+                ease: 'power3.out'
+            });
+
+            // Magnetic Elements Movement
+            document.querySelectorAll('.magnetic-item').forEach(el => {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    gsap.to(el, { x: x * 0.25, y: y * 0.25, duration: 0.3, ease: 'power2.out' });
+                });
+                el.addEventListener('mouseleave', () => {
+                    gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
+                });
+            });
         }
 
         function showToast(msg, type = 'success') {
