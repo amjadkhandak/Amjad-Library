@@ -1,30 +1,710 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amjad Library Demo</title>
+    <title>Amjad Library — Digital Archive</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        charcoal: {
+                            950: '#07090D',
+                            900: '#0B0D11',
+                            850: '#11151F',
+                            800: '#181E2C',
+                            700: '#242C3F',
+                        },
+                        champagne: {
+                            100: '#FAF3E0',
+                            300: '#E5C384',
+                            400: '#D4AF37',
+                            500: '#C59B27',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; text-align: center; padding: 50px; }
-        .book-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
-        .book { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 200px; }
-        h1 { color: #333; }
-        h3 { color: #0070f3; }
+        /* Custom luxury dark design styling */
+        body {
+            background-color: #07090D;
+            color: #E2E8F0;
+        }
+        
+        .glass-card {
+            background: rgba(17, 21, 31, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF0D0 0%, #E5C384 50%, #B88E2B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border {
+            border-color: rgba(212, 175, 55, 0.25);
+        }
+
+        .hero-glow {
+            background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.12) 0%, rgba(7, 9, 13, 0) 70%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07090D;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #242C3F;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
     </style>
 </head>
-<body>
-    <h1>Welcome to Amjad's Library</h1>
-    <p>Vercel deployment is successful!</p>
+<body class="min-h-screen flex flex-col justify-between selection:bg-champagne-400 selection:text-charcoal-950 font-sans">
 
-    <div class="book-container">
-        <div class="book">
-            <h3>Book 1</h3>
-            <p>Learn Next.js & React</p>
+    <!-- Ambient Top Glow Effect -->
+    <div class="fixed top-0 left-0 right-0 h-[500px] hero-glow pointer-events-none z-0"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-charcoal-950/80 backdrop-blur-md border-b border-white/10 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3.5">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-champagne-500 via-champagne-300 to-amber-100 flex items-center justify-center text-charcoal-950 shadow-lg shadow-champagne-500/20">
+                    <i class="fa-solid fa-compass text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-xl font-bold tracking-wider gold-gradient-text">AMJAD ARCHIVE</span>
+                    <p class="text-[10px] tracking-widest text-slate-400 uppercase font-medium">Digital Collection</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-4">
+                <!-- Direct Upload Button -->
+                <button onclick="openUploadModal()" class="flex items-center space-x-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-champagne-400 to-champagne-500 hover:from-champagne-300 hover:to-champagne-400 text-charcoal-950 font-semibold text-xs tracking-wide shadow-lg shadow-champagne-400/20 hover:shadow-champagne-400/30 active:scale-95 transition-all duration-300">
+                    <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
+                    <span>Upload Book</span>
+                </button>
+            </div>
         </div>
-        <div class="book">
-            <h3>Book 2</h3>
-            <p>Mastering Git & GitHub</p>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full relative z-10">
+
+        <!-- Editorial Hero Header Section -->
+        <section class="relative rounded-3xl overflow-hidden mb-12 border border-white/10 glass-card p-8 sm:p-12 lg:p-16">
+            <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-20 pointer-events-none hidden md:block bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1000&q=80'); filter: grayscale(100%) contrast(120%);"></div>
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-champagne-400/10 border border-champagne-400/30 text-champagne-300 text-xs font-medium mb-5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-champagne-400 animate-pulse"></span>
+                    <span class="tracking-widest uppercase">Private Knowledge Reserve</span>
+                </div>
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+                    Take a step into <br><span class="italic font-normal gold-gradient-text">curated wisdom.</span>
+                </h1>
+                <p class="mt-4 text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-xl">
+                    Discover, read, and manage your personal repository of digital books, research papers, and documents with instant view and download options.
+                </p>
+
+                <!-- Search Bar -->
+                <div class="mt-8 flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search library by title, author, or tag..." 
+                            class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-charcoal-900/90 border border-white/10 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-champagne-400/60 focus:ring-1 focus:ring-champagne-400/60 text-xs sm:text-sm transition-all duration-300">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Filters -->
+        <div class="flex items-center justify-between gap-4 mb-8 overflow-x-auto pb-2 no-scrollbar" id="categoryFilterContainer">
+            <div class="flex items-center space-x-2">
+                <button onclick="setCategory('All')" class="category-btn active px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-charcoal-950 shadow-md shadow-champagne-400/20" data-category="All">All Works</button>
+                <button onclick="setCategory('Literature')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Literature">Literature</button>
+                <button onclick="setCategory('Philosophy')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Philosophy">Philosophy</button>
+                <button onclick="setCategory('Technology')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Technology">Technology</button>
+                <button onclick="setCategory('Science')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Science">Science</button>
+                <button onclick="setCategory('Art & Design')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Art & Design">Art & Design</button>
+            </div>
+            <div id="bookCounter" class="text-xs text-slate-400 font-mono hidden sm:block">
+                Showing <span id="countNum" class="text-champagne-300 font-bold">0</span> items
+            </div>
+        </div>
+
+        <!-- Books Grid -->
+        <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamic Cards injected via JS -->
+        </div>
+
+        <!-- Empty State Message -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center glass-card rounded-3xl my-8">
+            <div class="w-16 h-16 rounded-full bg-charcoal-800 flex items-center justify-center text-champagne-400 text-2xl mb-4 border border-white/10">
+                <i class="fa-solid fa-book-bookmark"></i>
+            </div>
+            <h3 class="font-serif text-xl font-semibold text-white">No books found</h3>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm">No items matched your criteria. You can upload a new book to your offline local storage archive anytime.</p>
+            <button onclick="openUploadModal()" class="mt-5 px-5 py-2.5 rounded-full bg-champagne-400 hover:bg-champagne-300 text-charcoal-950 text-xs font-bold transition">
+                + Upload Book Now
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 bg-charcoal-950 text-center text-xs text-slate-500 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="font-serif font-bold text-slate-300">AMJAD DIGITAL ARCHIVE</span>
+                <span class="text-slate-600">•</span>
+                <span>Local Storage Persistence Engine</span>
+            </div>
+            <p>&copy; <span id="currentYear"></span> Amjad Dakhna. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Upload Book Modal -->
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-charcoal-950/80 backdrop-blur-md transition-opacity duration-300">
+        <div class="glass-card rounded-3xl max-w-lg w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto border border-champagne-400/30 shadow-2xl" id="uploadModalCard">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+                <div>
+                    <h3 class="font-serif text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-champagne-400 text-lg"></i>
+                        Upload Book to Archive
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Files are stored securely in your browser's LocalStorage</p>
+                </div>
+                <button onclick="closeUploadModal()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="uploadForm" onsubmit="handleFormUpload(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Book Title *</label>
+                    <input type="text" id="bookTitle" required placeholder="e.g. The Art of War" 
+                        class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white placeholder-slate-600 text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Author Name *</label>
+                    <input type="text" id="bookAuthor" required placeholder="e.g. Sun Tzu" 
+                        class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white placeholder-slate-600 text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Category *</label>
+                        <select id="bookCategory" required class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
+                            <option value="Literature">Literature</option>
+                            <option value="Philosophy">Philosophy</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Science">Science</option>
+                            <option value="Art & Design">Art & Design</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Cover Image Source</label>
+                        <select id="coverType" onchange="toggleCoverInput()" class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
+                            <option value="url">Image Web URL</option>
+                            <option value="file">Upload File from Device</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cover Input: URL -->
+                <div id="coverUrlContainer">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Cover Image URL</label>
+                    <input type="url" id="bookCoverUrl" placeholder="https://images.unsplash.com/..." 
+                        class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white placeholder-slate-600 text-xs sm:text-sm focus:outline-none focus:border-champagne-400">
+                </div>
+
+                <!-- Cover Input: File -->
+                <div id="coverFileContainer" class="hidden">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Select Image File</label>
+                    <input type="file" id="bookCoverFile" accept="image/*" 
+                        class="w-full px-3 py-2 rounded-xl bg-charcoal-900 border border-white/10 text-slate-400 text-xs focus:outline-none file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-champagne-400/20 file:text-champagne-300 hover:file:bg-champagne-400/30">
+                </div>
+
+                <!-- Book Document Attachment -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Attach Book Document (PDF or TXT) *</label>
+                    <div class="p-4 rounded-2xl bg-charcoal-900/80 border border-dashed border-champagne-400/40 text-center hover:border-champagne-400 transition">
+                        <i class="fa-solid fa-file-pdf text-champagne-400 text-2xl mb-2"></i>
+                        <input type="file" id="bookFile" accept=".pdf,.txt" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-champagne-400 file:text-charcoal-950 hover:file:bg-champagne-300 cursor-pointer">
+                        <p class="text-[10px] text-slate-500 mt-2">Converts to Base64 & saved in your browser LocalStorage.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Short Synopsis</label>
+                    <textarea id="bookDesc" rows="3" placeholder="Brief summary of the book content..." 
+                        class="w-full px-4 py-3 rounded-xl bg-charcoal-900 border border-white/10 text-white placeholder-slate-600 text-xs sm:text-sm focus:outline-none focus:border-champagne-400 resize-none"></textarea>
+                </div>
+
+                <!-- Modal Form Buttons -->
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t border-white/10">
+                    <button type="button" onclick="closeUploadModal()" class="px-5 py-2.5 rounded-full border border-white/10 text-slate-300 text-xs font-semibold hover:bg-white/5 transition">Cancel</button>
+                    <button type="submit" id="saveBookBtn" class="px-6 py-2.5 rounded-full bg-champagne-400 hover:bg-champagne-300 text-charcoal-950 text-xs font-bold tracking-wide shadow-lg shadow-champagne-400/20 transition flex items-center gap-2">
+                        <span>Save to Archive</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Book Reader & Details View Modal -->
+    <div id="readerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-charcoal-950/90 backdrop-blur-lg transition-opacity duration-300">
+        <div class="glass-card rounded-3xl max-w-4xl w-full h-[90vh] flex flex-col border border-champagne-400/30 overflow-hidden shadow-2xl relative">
+            <!-- Reader Modal Header -->
+            <div class="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between bg-charcoal-900/60">
+                <div class="flex items-center space-x-4">
+                    <div id="readerCategoryBadge" class="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-champagne-400/20 text-champagne-300 border border-champagne-400/30">
+                        Category
+                    </div>
+                    <div>
+                        <h2 id="readerTitle" class="font-serif text-lg sm:text-xl font-bold text-white line-clamp-1">Book Title</h2>
+                        <p id="readerAuthor" class="text-xs text-slate-400">by Author</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="modalDownloadBtn" class="px-4 py-2 rounded-full bg-champagne-400 hover:bg-champagne-300 text-charcoal-950 text-xs font-bold flex items-center gap-2 transition">
+                        <i class="fa-solid fa-download"></i>
+                        <span class="hidden sm:inline">Download File</span>
+                    </button>
+                    <button onclick="closeReaderModal()" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reader Modal Body -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-6" id="readerContainer">
+                <!-- Book Overview & Content Preview -->
+                <div class="flex flex-col sm:flex-row gap-6 items-start bg-charcoal-900/40 p-5 rounded-2xl border border-white/5">
+                    <img id="readerCover" src="" alt="Book Cover" class="w-28 h-40 object-cover rounded-xl shadow-md border border-white/10 flex-shrink-0">
+                    <div class="flex-1">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-champagne-400 mb-1">Synopsis & Overview</h4>
+                        <p id="readerDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed font-light">Description here...</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Viewer Box -->
+                <div class="flex-1 rounded-2xl border border-white/10 bg-charcoal-950 overflow-hidden flex flex-col min-h-[350px]">
+                    <div class="px-4 py-2.5 bg-charcoal-900/80 border-b border-white/10 text-xs text-slate-400 font-mono flex items-center justify-between">
+                        <span><i class="fa-solid fa-file-lines text-champagne-400 mr-2"></i> Document Viewer</span>
+                        <span id="readerFileName" class="text-[10px] text-slate-500">file.pdf</span>
+                    </div>
+                    <div id="viewerContent" class="flex-1 p-4 overflow-auto flex items-center justify-center">
+                        <!-- Rendered PDF iframe or text box injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center space-x-3 px-5 py-3.5 rounded-2xl bg-charcoal-850 border border-champagne-400/40 text-white shadow-2xl text-xs font-medium">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-champagne-400 text-base"></i>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <!-- JavaScript Engine -->
+    <script>
+        // Sample Pre-loaded Classic Books Data (Embedded Base64 TXT Data for instant reading)
+        const initialBooks = [
+            {
+                id: '1',
+                title: 'The Art of War',
+                author: 'Sun Tzu',
+                category: 'Philosophy',
+                description: 'An ancient Chinese military treatise dating from the Late Spring and Autumn Period. The work, which is attributed to the ancient Chinese military strategist Sun Tzu, is composed of 13 chapters.',
+                cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',
+                fileName: 'Art_Of_War_Sun_Tzu.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,VEhFCiBBUlQgT0YgV0FSCgpieSBTdW4gVHp1CgoxLiBMQVlJTkcgUExBTlMKU3VuIFR6dSBzYWlkOiBUaGUgYXJ0IG9mIHdhciBpcyBvZiB2aXRhbCBpbXBvcnRhbmNlIHRvIHRoZSBTdGF0ZS4gSXQgaXMgYSBtYXR0ZXIgb2YgbGlmZSBhbmQgZGVhdGgsIGEgcm9hZCBlaXRoZXIgdG8gc2FmdHkgb3IgdG8gcnVpbi4gSGVuY2UgaXQgaXMgYSBzdHVkeSB3aGljaCBjYW4gb24gbm8gYWNjb3VudCBiZSBuZWdsZWN0ZWQu'
+            },
+            {
+                id: '2',
+                title: 'Meditations',
+                author: 'Marcus Aurelius',
+                category: 'Literature',
+                description: 'A series of personal writings by Marcus Aurelius, Roman Emperor from AD 161 to 180, recording his private notes to himself and ideas on Stoic philosophy.',
+                cover: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=600&q=80',
+                fileName: 'Meditations_Marcus_Aurelius.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,TUVESVRBVElPTlMKQnkgTWFyY3VzIEF1cmVsaXVzCgpCT09LIE9ORQoxLiBGcm9tIG15IGdyYW5kZmF0aGVyIFZlcnVzIEkgbGVhcm5lZCBnb29kIG1vcmFscyBhbmQgdGhlIGdvdmVybm1lbnQgb2YgbXkgdGVtcGVyLgoyLiBGcm9tIHRoZSByZXB1dGF0aW9uIGFuZCByZW1lbWJyYW5jZSBvZiBteSBiZWdldHRlcg==='
+            },
+            {
+                id: '3',
+                title: 'Digital Systems & Design',
+                author: 'Amjad Dakhna',
+                category: 'Technology',
+                description: 'An architectural exploration into modern user experience engineering, web compilation workflows, and dark digital aesthetic paradigms.',
+                cover: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80',
+                fileName: 'Digital_Systems_Design.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,RElHSVRBTCAgU1lTVEVNUyAmIERFU0lHTgpCeSBBbWphZCBEYWtobmEKCkNIQVBURVIgMTogVEhFIExVTlRBTiBBRVNUSEVUSUMKTW9kZXJuIHdlYiBhcHBsaWNhdGlvbnMgcmVxdWlyZSBhbGlnbm1lbnQgYmV0d2VlbiBmdW5jdGlvbmFsaXR5IGFuZCB2aXN1YWwgZ3JhY2Uu'
+            }
+        ];
+
+        // State variables
+        let books = [];
+        let currentCategory = 'All';
+        let searchQuery = '';
+        let activeBookForReader = null;
+
+        // Initialize App on DOM Load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            loadBooksFromStorage();
+            render();
+        });
+
+        // Load Books from LocalStorage or Fallback to Samples
+        function loadBooksFromStorage() {
+            const stored = localStorage.getItem('amjad_luxury_library_books');
+            if (stored) {
+                try {
+                    books = JSON.parse(stored);
+                } catch (e) {
+                    books = [...initialBooks];
+                }
+            } else {
+                books = [...initialBooks];
+                saveBooksToStorage();
+            }
+        }
+
+        // Save Books to LocalStorage
+        function saveBooksToStorage() {
+            try {
+                localStorage.setItem('amjad_luxury_library_books', JSON.stringify(books));
+            } catch (e) {
+                showToast('Storage quota exceeded! Please remove some large files.', 'error');
+            }
+        }
+
+        // Render Cards and Update Counter
+        function render() {
+            const booksGrid = document.getElementById('booksGrid');
+            const emptyState = document.getElementById('emptyState');
+            const countNum = document.getElementById('countNum');
+
+            const filteredBooks = books.filter(book => {
+                const matchesCategory = currentCategory === 'All' || book.category === currentCategory;
+                const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      book.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            countNum.textContent = filteredBooks.length;
+
+            if (filteredBooks.length === 0) {
+                booksGrid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            booksGrid.innerHTML = filteredBooks.map(book => {
+                const defaultImage = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&q=80';
+                const coverUrl = book.cover && book.cover.trim() !== '' ? book.cover : defaultImage;
+
+                return `
+                    <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300">
+                        <!-- Book Cover Image -->
+                        <div class="relative h-60 overflow-hidden bg-charcoal-900 border-b border-white/5">
+                            <img src="${coverUrl}" alt="${escapeHtml(book.title)}" 
+                                onerror="this.src='${defaultImage}'"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/20 to-transparent"></div>
+                            
+                            <!-- Category Badge -->
+                            <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-charcoal-950/80 text-champagne-300 border border-champagne-400/30 backdrop-blur-md">
+                                ${escapeHtml(book.category)}
+                            </span>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif font-bold text-white text-lg line-clamp-1 group-hover:text-champagne-300 transition-colors">
+                                    ${escapeHtml(book.title)}
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-0.5 mb-3">
+                                    by <span class="text-slate-200 font-medium">${escapeHtml(book.author)}</span>
+                                </p>
+                                <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed font-light">
+                                    ${escapeHtml(book.description || 'No summary provided for this archive entry.')}
+                                </p>
+                            </div>
+
+                            <!-- Card Action Buttons -->
+                            <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between gap-2">
+                                <button onclick="openReaderModal('${book.id}')" 
+                                    class="flex-1 py-2 px-3 rounded-full bg-champagne-400/10 hover:bg-champagne-400 text-champagne-300 hover:text-charcoal-950 border border-champagne-400/30 text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <span>View / Read</span>
+                                </button>
+
+                                <button onclick="downloadBookFile('${book.id}')" title="Download Document"
+                                    class="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-champagne-300 transition-colors">
+                                    <i class="fa-solid fa-download text-xs"></i>
+                                </button>
+
+                                <button onclick="deleteBook('${book.id}')" title="Delete Book" 
+                                    class="p-2 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Handle Search Input
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value;
+            render();
+        }
+
+        // Handle Category Selection
+        function setCategory(category) {
+            currentCategory = category;
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-category') === category) {
+                    btn.className = 'category-btn active px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-charcoal-950 shadow-md shadow-champagne-400/20';
+                } else {
+                    btn.className = 'category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40';
+                }
+            });
+            render();
+        }
+
+        // Reader Modal Utility
+        function openReaderModal(id) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+
+            activeBookForReader = book;
+
+            document.getElementById('readerTitle').textContent = book.title;
+            document.getElementById('readerAuthor').textContent = `by ${book.author}`;
+            document.getElementById('readerCategoryBadge').textContent = book.category;
+            document.getElementById('readerDesc').textContent = book.description || 'No summary available.';
+            document.getElementById('readerCover').src = book.cover || 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&q=80';
+            document.getElementById('readerFileName').textContent = book.fileName || 'document.pdf';
+
+            // Download button binding inside modal
+            document.getElementById('modalDownloadBtn').onclick = () => downloadBookFile(book.id);
+
+            // Render PDF iframe or Text inside viewer
+            const viewerContent = document.getElementById('viewerContent');
+            if (book.fileData) {
+                if (book.fileData.startsWith('data:application/pdf')) {
+                    viewerContent.innerHTML = `<iframe src="${book.fileData}" class="w-full h-full min-h-[450px] rounded-xl border border-white/10"></iframe>`;
+                } else {
+                    // Plain text decoding or viewer display
+                    try {
+                        const base64Content = book.fileData.split(',')[1];
+                        const text = atob(base64Content);
+                        viewerContent.innerHTML = `<pre class="w-full h-full min-h-[350px] p-4 text-xs sm:text-sm text-slate-300 font-mono whitespace-pre-wrap leading-relaxed select-text">${escapeHtml(text)}</pre>`;
+                    } catch (e) {
+                        viewerContent.innerHTML = `<iframe src="${book.fileData}" class="w-full h-full min-h-[450px] rounded-xl border border-white/10"></iframe>`;
+                    }
+                }
+            } else {
+                viewerContent.innerHTML = `<div class="text-center text-slate-500 text-xs py-12">No readable file data attached for this book.</div>`;
+            }
+
+            document.getElementById('readerModal').classList.remove('hidden');
+        }
+
+        function closeReaderModal() {
+            document.getElementById('readerModal').classList.add('hidden');
+            document.getElementById('viewerContent').innerHTML = '';
+        }
+
+        // Download Book File
+        function downloadBookFile(id) {
+            const book = books.find(b => b.id === id);
+            if (!book || !book.fileData) {
+                showToast('No downloadable file attached to this book.', 'error');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = book.fileData;
+            link.download = book.fileName || `${book.title.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast(`Downloading "${book.title}"...`);
+        }
+
+        // Delete Book
+        function deleteBook(id) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+
+            books = books.filter(b => b.id !== id);
+            saveBooksToStorage();
+            render();
+            showToast(`Deleted "${book.title}" from library.`);
+        }
+
+        // Upload Form Handler
+        async function handleFormUpload(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('bookTitle').value.trim();
+            const author = document.getElementById('bookAuthor').value.trim();
+            const category = document.getElementById('bookCategory').value;
+            const coverType = document.getElementById('coverType').value;
+            const description = document.getElementById('bookDesc').value.trim();
+
+            let cover = '';
+            if (coverType === 'url') {
+                cover = document.getElementById('bookCoverUrl').value.trim();
+            } else {
+                const coverFile = document.getElementById('bookCoverFile').files[0];
+                if (coverFile) {
+                    cover = await readFileAsBase64(coverFile);
+                }
+            }
+
+            // Book file handling
+            const bookFileInput = document.getElementById('bookFile').files[0];
+            if (!bookFileInput) {
+                showToast('Please attach a PDF or TXT book document.', 'error');
+                return;
+            }
+
+            const fileData = await readFileAsBase64(bookFileInput);
+
+            const newBook = {
+                id: Date.now().toString(),
+                title,
+                author,
+                category,
+                description,
+                cover,
+                fileName: bookFileInput.name,
+                fileType: bookFileInput.type,
+                fileData
+            };
+
+            books.unshift(newBook);
+            saveBooksToStorage();
+            render();
+            closeUploadModal();
+            document.getElementById('uploadForm').reset();
+            showToast(`Successfully uploaded "${title}" to archive!`);
+        }
+
+        // Utility: Convert File to Base64
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Toggle Cover Input Types
+        function toggleCoverInput() {
+            const coverType = document.getElementById('coverType').value;
+            if (coverType === 'url') {
+                document.getElementById('coverUrlContainer').classList.remove('hidden');
+                document.getElementById('coverFileContainer').classList.add('hidden');
+            } else {
+                document.getElementById('coverUrlContainer').classList.add('hidden');
+                document.getElementById('coverFileContainer').classList.remove('hidden');
+            }
+        }
+
+        // Modal Controls
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+        }
+
+        // Toast Feedback System
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.textContent = msg;
+            if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-triangle-exclamation text-red-400 text-base';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-champagne-400 text-base';
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+
+        // HTML Escaper Guard
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+    </script>
 </body>
 </html>
