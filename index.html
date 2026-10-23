@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amjad Library — Digital Archive</title>
+    <title>Amjad Library — Luxury 3D Digital Archive</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <!-- Three.js Library for 3D Background Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -42,10 +44,10 @@
         }
     </script>
     <style>
-        /* Custom luxury dark design styling */
         body {
             background-color: #07090D;
             color: #E2E8F0;
+            overflow-x: hidden;
         }
         
         .glass-card {
@@ -53,11 +55,30 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
         }
         
         .glass-card:hover {
-            border-color: rgba(212, 175, 55, 0.3);
-            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.15);
+        }
+
+        .card-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+            pointer-events: none;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .glass-card:hover .card-glare {
+            opacity: 1;
         }
 
         .gold-gradient-text {
@@ -66,12 +87,8 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .gold-border {
-            border-color: rgba(212, 175, 55, 0.25);
-        }
-
         .hero-glow {
-            background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.12) 0%, rgba(7, 9, 13, 0) 70%);
+            background: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.15) 0%, rgba(7, 9, 13, 0) 70%);
         }
 
         /* Custom Scrollbar */
@@ -89,30 +106,37 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #D4AF37;
         }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-champagne-400 selection:text-charcoal-950 font-sans">
+<body class="min-h-screen flex flex-col justify-between selection:bg-champagne-400 selection:text-charcoal-950 font-sans relative">
 
-    <!-- Ambient Top Glow Effect -->
-    <div class="fixed top-0 left-0 right-0 h-[500px] hero-glow pointer-events-none z-0"></div>
+    <!-- Ambient Glow Top Background -->
+    <div class="fixed top-0 left-0 right-0 h-[600px] hero-glow pointer-events-none z-0"></div>
 
     <!-- Navigation Header -->
-    <header class="sticky top-0 z-40 bg-charcoal-950/80 backdrop-blur-md border-b border-white/10 transition-colors">
+    <header class="sticky top-0 z-40 bg-charcoal-950/85 backdrop-blur-md border-b border-white/10 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
             <!-- Brand Logo -->
-            <div class="flex items-center space-x-3.5">
+            <div class="flex items-center space-x-3.5 cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-champagne-500 via-champagne-300 to-amber-100 flex items-center justify-center text-charcoal-950 shadow-lg shadow-champagne-500/20">
                     <i class="fa-solid fa-compass text-lg"></i>
                 </div>
                 <div>
                     <span class="font-serif text-xl font-bold tracking-wider gold-gradient-text">AMJAD ARCHIVE</span>
-                    <p class="text-[10px] tracking-widest text-slate-400 uppercase font-medium">Digital Collection</p>
+                    <p class="text-[10px] tracking-widest text-slate-400 uppercase font-medium">3D Digital Collection</p>
                 </div>
             </div>
 
             <!-- Header Action Controls -->
             <div class="flex items-center space-x-4">
-                <!-- Direct Upload Button -->
                 <button onclick="openUploadModal()" class="flex items-center space-x-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-champagne-400 to-champagne-500 hover:from-champagne-300 hover:to-champagne-400 text-charcoal-950 font-semibold text-xs tracking-wide shadow-lg shadow-champagne-400/20 hover:shadow-champagne-400/30 active:scale-95 transition-all duration-300">
                     <i class="fa-solid fa-arrow-up-from-bracket text-xs"></i>
                     <span>Upload Book</span>
@@ -122,36 +146,10 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full relative z-10">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full relative z-10">
 
-        <!-- Editorial Hero Header Section -->
-        <section class="relative rounded-3xl overflow-hidden mb-12 border border-white/10 glass-card p-8 sm:p-12 lg:p-16">
-            <div class="absolute right-0 top-0 bottom-0 w-1/2 opacity-20 pointer-events-none hidden md:block bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1000&q=80'); filter: grayscale(100%) contrast(120%);"></div>
-            <div class="relative z-10 max-w-2xl">
-                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-champagne-400/10 border border-champagne-400/30 text-champagne-300 text-xs font-medium mb-5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-champagne-400 animate-pulse"></span>
-                    <span class="tracking-widest uppercase">Private Knowledge Reserve</span>
-                </div>
-                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-                    Take a step into <br><span class="italic font-normal gold-gradient-text">curated wisdom.</span>
-                </h1>
-                <p class="mt-4 text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-xl">
-                    Discover, read, and manage your personal repository of digital books, research papers, and documents with instant view and download options.
-                </p>
-
-                <!-- Search Bar -->
-                <div class="mt-8 flex flex-col sm:flex-row items-center gap-3">
-                    <div class="relative w-full">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search library by title, author, or tag..." 
-                            class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-charcoal-900/90 border border-white/10 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-champagne-400/60 focus:ring-1 focus:ring-champagne-400/60 text-xs sm:text-sm transition-all duration-300">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Category Filters -->
-        <div class="flex items-center justify-between gap-4 mb-8 overflow-x-auto pb-2 no-scrollbar" id="categoryFilterContainer">
+        <!-- 1. CATEGORY FILTERS (POSITIONED ABOVE HERO BANNER) -->
+        <div class="mb-8 p-3 glass-card rounded-2xl flex items-center justify-between gap-4 overflow-x-auto no-scrollbar border border-champagne-400/20 shadow-xl" id="categoryFilterContainer">
             <div class="flex items-center space-x-2">
                 <button onclick="setCategory('All')" class="category-btn active px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-champagne-400 text-charcoal-950 shadow-md shadow-champagne-400/20" data-category="All">All Works</button>
                 <button onclick="setCategory('Literature')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Literature">Literature</button>
@@ -159,15 +157,46 @@
                 <button onclick="setCategory('Technology')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Technology">Technology</button>
                 <button onclick="setCategory('Science')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Science">Science</button>
                 <button onclick="setCategory('Art & Design')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Art & Design">Art & Design</button>
+                <button onclick="setCategory('Business')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="Business">Business</button>
+                <button onclick="setCategory('History')" class="category-btn px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-all duration-300 bg-charcoal-900 text-slate-400 hover:text-white border border-white/10 hover:border-champagne-400/40" data-category="History">History</button>
             </div>
-            <div id="bookCounter" class="text-xs text-slate-400 font-mono hidden sm:block">
-                Showing <span id="countNum" class="text-champagne-300 font-bold">0</span> items
+            <div id="bookCounter" class="text-xs text-slate-400 font-mono hidden sm:block px-3 border-l border-white/10">
+                Total: <span id="countNum" class="text-champagne-300 font-bold">0</span> works
             </div>
         </div>
 
-        <!-- Books Grid -->
+        <!-- 2. EDITORIAL HERO BANNER WITH INTERACTIVE 3D THREE.JS CANVAS -->
+        <section class="relative rounded-3xl overflow-hidden mb-12 border border-white/10 glass-card p-8 sm:p-12 lg:p-16 min-h-[380px] flex items-center shadow-2xl">
+            <!-- Three.js Canvas Container -->
+            <div id="hero3dCanvasContainer" class="absolute inset-0 z-0 opacity-80 pointer-events-none"></div>
+
+            <!-- Foreground Content -->
+            <div class="relative z-10 max-w-2xl">
+                <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-champagne-400/10 border border-champagne-400/30 text-champagne-300 text-xs font-medium mb-5 backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-champagne-400 animate-ping"></span>
+                    <span class="tracking-widest uppercase">Private Knowledge Reserve</span>
+                </div>
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+                    Step into <br><span class="italic font-normal gold-gradient-text">curated wisdom.</span>
+                </h1>
+                <p class="mt-4 text-sm sm:text-base text-slate-300 font-light leading-relaxed max-w-xl">
+                    Discover, read, and download your personal repository of digital books, research papers, and rare documents with instant 3D interactive preview capabilities.
+                </p>
+
+                <!-- Search Bar -->
+                <div class="mt-8 flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-champagne-400 text-sm"></i>
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search library by title, author, or category..." 
+                            class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-charcoal-900/90 border border-white/10 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-champagne-400/60 focus:ring-1 focus:ring-champagne-400/60 text-xs sm:text-sm transition-all duration-300">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. BOOKS GRID -->
         <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Dynamic Cards injected via JS -->
+            <!-- Dynamic Cards injected via JS with 3D Tilt Effect -->
         </div>
 
         <!-- Empty State Message -->
@@ -184,7 +213,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-white/10 py-8 bg-charcoal-950 text-center text-xs text-slate-500 relative z-10">
+    <footer class="border-t border-white/10 py-8 bg-charcoal-950 text-center text-xs text-slate-500 relative z-10 mt-12">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-2">
                 <span class="font-serif font-bold text-slate-300">AMJAD DIGITAL ARCHIVE</span>
@@ -235,6 +264,8 @@
                             <option value="Technology">Technology</option>
                             <option value="Science">Science</option>
                             <option value="Art & Design">Art & Design</option>
+                            <option value="Business">Business</option>
+                            <option value="History">History</option>
                         </select>
                     </div>
 
@@ -266,7 +297,7 @@
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Attach Book Document (PDF or TXT) *</label>
                     <div class="p-4 rounded-2xl bg-charcoal-900/80 border border-dashed border-champagne-400/40 text-center hover:border-champagne-400 transition">
                         <i class="fa-solid fa-file-pdf text-champagne-400 text-2xl mb-2"></i>
-                        <input type="file" id="bookFile" accept=".pdf,.txt" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-champagne-400 file:text-charcoal-950 hover:file:bg-champagne-300 cursor-pointer">
+                        <input type="file" id="bookFile" accept=".pdf,.txt,.doc" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-champagne-400 file:text-charcoal-950 hover:file:bg-champagne-300 cursor-pointer">
                         <p class="text-[10px] text-slate-500 mt-2">Converts to Base64 & saved in your browser LocalStorage.</p>
                     </div>
                 </div>
@@ -344,16 +375,16 @@
         <span id="toastMessage">Notification message</span>
     </div>
 
-    <!-- JavaScript Engine -->
+    <!-- Application Scripting -->
     <script>
-        // Sample Pre-loaded Classic Books Data (Embedded Base64 TXT Data for instant reading)
+        // 7 Rich Pre-Loaded Sample Books Data
         const initialBooks = [
             {
                 id: '1',
                 title: 'The Art of War',
                 author: 'Sun Tzu',
                 category: 'Philosophy',
-                description: 'An ancient Chinese military treatise dating from the Late Spring and Autumn Period. The work, which is attributed to the ancient Chinese military strategist Sun Tzu, is composed of 13 chapters.',
+                description: 'An ancient Chinese military treatise attributed to Sun Tzu. The work consists of 13 chapters, each devoted to one aspect of warfare and strategic decision making.',
                 cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',
                 fileName: 'Art_Of_War_Sun_Tzu.txt',
                 fileType: 'text/plain',
@@ -364,7 +395,7 @@
                 title: 'Meditations',
                 author: 'Marcus Aurelius',
                 category: 'Literature',
-                description: 'A series of personal writings by Marcus Aurelius, Roman Emperor from AD 161 to 180, recording his private notes to himself and ideas on Stoic philosophy.',
+                description: 'A collection of personal journal entries by Roman Emperor Marcus Aurelius, detailing his Stoic reflections on virtue, duty, and human nature.',
                 cover: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=600&q=80',
                 fileName: 'Meditations_Marcus_Aurelius.txt',
                 fileType: 'text/plain',
@@ -375,28 +406,173 @@
                 title: 'Digital Systems & Design',
                 author: 'Amjad Dakhna',
                 category: 'Technology',
-                description: 'An architectural exploration into modern user experience engineering, web compilation workflows, and dark digital aesthetic paradigms.',
+                description: 'An architectural exploration into modern web application engineering, microservices compilation workflows, and dark digital aesthetic paradigms.',
                 cover: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&q=80',
                 fileName: 'Digital_Systems_Design.txt',
                 fileType: 'text/plain',
                 fileData: 'data:text/plain;base64,RElHSVRBTCAgU1lTVEVNUyAmIERFU0lHTgpCeSBBbWphZCBEYWtobmEKCkNIQVBURVIgMTogVEhFIExVTlRBTiBBRVNUSEVUSUMKTW9kZXJuIHdlYiBhcHBsaWNhdGlvbnMgcmVxdWlyZSBhbGlnbm1lbnQgYmV0d2VlbiBmdW5jdGlvbmFsaXR5IGFuZCB2aXN1YWwgZ3JhY2Uu'
+            },
+            {
+                id: '4',
+                title: 'Principles of Quantum Physics',
+                author: 'Dr. Elena Rostova',
+                category: 'Science',
+                description: 'A comprehensive study into subatomic mechanics, wave-particle duality, quantum entanglement, and theoretical physics principles.',
+                cover: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80',
+                fileName: 'Quantum_Physics_Principles.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,UFJJTkNJUExFUyBPRiBRVUFOVFVNIFBIWVNJQ1MKQnkgRHIuIEVsZW5hIFJvc3RvdmEKCkNIQVBURVIgMTogV0FWRS1QQVJUSUNMRSBEVUFMSVRZCUXigJlzIGF0IHRoZSBzdWJhdG9taWMgc2NhbGUgdGhhdCBjbGFzc2ljYWwgbWVjaGFuaWNzIGNlYXNlcyB0byBwb3NzZXNzIHByZWRpY3RpdmUgcG93ZXIu'
+            },
+            {
+                id: '5',
+                title: 'The Elements of Typographic Style',
+                author: 'Julian Vance',
+                category: 'Art & Design',
+                description: 'A masterclass manual in grid layout systems, serif typography balance, micro-typesetting hierarchy, and editorial aesthetics.',
+                cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80',
+                fileName: 'Typographic_Style_Guide.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,VEhFIEVMRU1FTlRTIE9GIFRZUE9HUkFQSElDIFNUWUxFCkJ5IEp1bGlhbiBWYW5jZQoKQ0hBUFRFUiAxOiBSSFlUSE0gJiBQUk9QT1JUSU9OClR5cG9ncmFwaHkgaXMgdGhlIGNyYWZ0IG9mIGVuZG93aW5nIGh1bWFuIHNwZWVjaCB3aXRoIGEgcGVybWFuZW50IHZpc3VhbCBmb3JtLg=='
+            },
+            {
+                id: '6',
+                title: 'The Mindset of Wealth & Enterprise',
+                author: 'Victoria Sterling',
+                category: 'Business',
+                description: 'Strategic frameworks on modern capital asset allocation, venture investment philosophy, and resilient corporate scaling dynamics.',
+                cover: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&q=80',
+                fileName: 'Mindset_of_Wealth.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,VEhFIE1JTkRTRVQgT0YgV0VBTFRIICYgRU5URVJQUklTRQpCeSBWaWN0b3JpYSBTdGVybGluZwoKQ0hBUFRFUiAxOiBDQVBJVEFMIEFMTE9DQVRJT04KUnVlIG51bWJlciBvbmUgaW4gdmVudHVyZSBjYXBpdGFsIGlzIHByZXNlcnZpbmcgY29tcG91bmQgbW9tZW50dW0u'
+            },
+            {
+                id: '7',
+                title: 'Chronicles of Ancient Empires',
+                author: 'Prof. Arthur Pendelton',
+                category: 'History',
+                description: 'An authoritative archaeological survey documenting the rise, administrative networks, and cultural legacies of Mediterranean civilizations.',
+                cover: 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=600&q=80',
+                fileName: 'Chronicles_Ancient_Empires.txt',
+                fileType: 'text/plain',
+                fileData: 'data:text/plain;base64,Q0hST05JQ0xFUyBPRiBBTkNJRU5UIEVNUElSRVMKQnkgUHJvZi4gQXJ0aHVyIFBlbmRsZXRvbgoKQ0hBUFRFUiAxOiBUSEUgTUVTSU9OIEFHRSBPQkVMSVNLUwpBb25nIHRoZSBiYW5rcyBvZiB0aGUgTmlsZSwgdGhlIGFybWFkYXMgYnVpbHQgbW9udW1lbnRzIHRoYXQgd291bGQgb3V0bGFzdCB0aGVpciBvd24gZHluYXN0aWVzLg=='
             }
         ];
 
-        // State variables
+        // Global State
         let books = [];
         let currentCategory = 'All';
         let searchQuery = '';
         let activeBookForReader = null;
 
-        // Initialize App on DOM Load
-        document.addEventListener('DOMContentLoaded', () => {
+        // On Load
+        window.onload = function() {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
+            initThreeJsHero();
             loadBooksFromStorage();
             render();
-        });
+        };
 
-        // Load Books from LocalStorage or Fallback to Samples
+        // 3D Three.js Hero Canvas Scene Setup
+        function initThreeJsHero() {
+            const container = document.getElementById('hero3dCanvasContainer');
+            if (!container || typeof THREE === 'undefined') return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 8;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Floating 3D Gold Geometries (Books & Polyhedra)
+            const objectsGroup = new THREE.Group();
+            scene.add(objectsGroup);
+
+            // Materials
+            const goldMaterial = new THREE.MeshStandardMaterial({
+                color: 0xD4AF37,
+                metalness: 0.8,
+                roughness: 0.25,
+                wireframe: false
+            });
+
+            const glassMaterial = new THREE.MeshStandardMaterial({
+                color: 0x181E2C,
+                metalness: 0.3,
+                roughness: 0.4,
+                wireframe: true
+            });
+
+            // Geometry 1: Floating Book Shapes
+            for (let i = 0; i < 5; i++) {
+                const bookGeo = new THREE.BoxGeometry(1.2, 1.6, 0.25);
+                const bookMesh = new THREE.Mesh(bookGeo, goldMaterial);
+                bookMesh.position.set((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 3);
+                bookMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+                objectsGroup.add(bookMesh);
+            }
+
+            // Geometry 2: Floating Polyhedra Shapes
+            for (let i = 0; i < 6; i++) {
+                const polyGeo = i % 2 === 0 ? new THREE.IcosahedronGeometry(0.5, 0) : new THREE.OctahedronGeometry(0.6, 0);
+                const polyMesh = new THREE.Mesh(polyGeo, glassMaterial);
+                polyMesh.position.set((Math.random() - 0.5) * 9, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 4);
+                objectsGroup.add(polyMesh);
+            }
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xD4AF37, 2, 50);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+
+            const pointLight2 = new THREE.PointLight(0xE5C384, 1.5, 50);
+            pointLight2.position.set(-5, -5, 2);
+            scene.add(pointLight2);
+
+            // Mouse interaction
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 0.8;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 0.8;
+            });
+
+            // Window Resize listener
+            window.addEventListener('resize', () => {
+                if (!container) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            // Animation Loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Smooth rotation & Mouse reaction
+                objectsGroup.rotation.y += 0.003;
+                objectsGroup.rotation.x += (mouseY - objectsGroup.rotation.x) * 0.05;
+                objectsGroup.rotation.y += (mouseX - objectsGroup.rotation.y) * 0.05;
+
+                // Subtle floating wave effect
+                const time = Date.now() * 0.001;
+                objectsGroup.children.forEach((child, idx) => {
+                    child.position.y += Math.sin(time + idx) * 0.002;
+                    child.rotation.x += 0.002;
+                    child.rotation.y += 0.003;
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+
+        // LocalStorage Loader
         function loadBooksFromStorage() {
             const stored = localStorage.getItem('amjad_luxury_library_books');
             if (stored) {
@@ -411,7 +587,6 @@
             }
         }
 
-        // Save Books to LocalStorage
         function saveBooksToStorage() {
             try {
                 localStorage.setItem('amjad_luxury_library_books', JSON.stringify(books));
@@ -420,7 +595,7 @@
             }
         }
 
-        // Render Cards and Update Counter
+        // Render Cards with 3D Physics Tilt Effect
         function render() {
             const booksGrid = document.getElementById('booksGrid');
             const emptyState = document.getElementById('emptyState');
@@ -451,9 +626,14 @@
                 const coverUrl = book.cover && book.cover.trim() !== '' ? book.cover : defaultImage;
 
                 return `
-                    <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300">
+                    <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between group relative cursor-pointer" 
+                         onmousemove="handleCardTilt(event, this)" 
+                         onmouseleave="resetCardTilt(this)">
+                        
+                        <div class="card-glare"></div>
+
                         <!-- Book Cover Image -->
-                        <div class="relative h-60 overflow-hidden bg-charcoal-900 border-b border-white/5">
+                        <div class="relative h-64 overflow-hidden bg-charcoal-900 border-b border-white/5">
                             <img src="${coverUrl}" alt="${escapeHtml(book.title)}" 
                                 onerror="this.src='${defaultImage}'"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -466,7 +646,7 @@
                         </div>
 
                         <!-- Card Body -->
-                        <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div class="p-5 flex-1 flex flex-col justify-between relative z-10">
                             <div>
                                 <h3 class="font-serif font-bold text-white text-lg line-clamp-1 group-hover:text-champagne-300 transition-colors">
                                     ${escapeHtml(book.title)}
@@ -479,21 +659,21 @@
                                 </p>
                             </div>
 
-                            <!-- Card Action Buttons -->
+                            <!-- Card Actions -->
                             <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between gap-2">
                                 <button onclick="openReaderModal('${book.id}')" 
-                                    class="flex-1 py-2 px-3 rounded-full bg-champagne-400/10 hover:bg-champagne-400 text-champagne-300 hover:text-charcoal-950 border border-champagne-400/30 text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-1.5">
-                                    <i class="fa-solid fa-eye"></i>
+                                    class="flex-1 py-2 px-3 rounded-full bg-champagne-400/10 hover:bg-champagne-400 text-champagne-300 hover:text-charcoal-950 border border-champagne-400/30 text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md">
+                                    <i class="fa-solid fa-eye text-xs"></i>
                                     <span>View / Read</span>
                                 </button>
 
                                 <button onclick="downloadBookFile('${book.id}')" title="Download Document"
-                                    class="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-champagne-300 transition-colors">
+                                    class="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 hover:text-champagne-300 transition-colors border border-white/5">
                                     <i class="fa-solid fa-download text-xs"></i>
                                 </button>
 
                                 <button onclick="deleteBook('${book.id}')" title="Delete Book" 
-                                    class="p-2 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors">
+                                    class="p-2 rounded-full bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors border border-white/5">
                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                 </button>
                             </div>
@@ -503,13 +683,35 @@
             }).join('');
         }
 
-        // Handle Search Input
+        // 3D Tilt Card Movement Calculations
+        function handleCardTilt(e, card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -10;
+            const rotateY = ((x - centerX) / centerX) * 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+            card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+            card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+        }
+
+        function resetCardTilt(card) {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        }
+
+        // Search
         function handleSearch() {
             searchQuery = document.getElementById('searchInput').value;
             render();
         }
 
-        // Handle Category Selection
+        // Category Filter Selection
         function setCategory(category) {
             currentCategory = category;
             const buttons = document.querySelectorAll('.category-btn');
@@ -523,7 +725,7 @@
             render();
         }
 
-        // Reader Modal Utility
+        // Modal Controls
         function openReaderModal(id) {
             const book = books.find(b => b.id === id);
             if (!book) return;
@@ -537,16 +739,13 @@
             document.getElementById('readerCover').src = book.cover || 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&q=80';
             document.getElementById('readerFileName').textContent = book.fileName || 'document.pdf';
 
-            // Download button binding inside modal
             document.getElementById('modalDownloadBtn').onclick = () => downloadBookFile(book.id);
 
-            // Render PDF iframe or Text inside viewer
             const viewerContent = document.getElementById('viewerContent');
             if (book.fileData) {
                 if (book.fileData.startsWith('data:application/pdf')) {
                     viewerContent.innerHTML = `<iframe src="${book.fileData}" class="w-full h-full min-h-[450px] rounded-xl border border-white/10"></iframe>`;
                 } else {
-                    // Plain text decoding or viewer display
                     try {
                         const base64Content = book.fileData.split(',')[1];
                         const text = atob(base64Content);
@@ -567,7 +766,6 @@
             document.getElementById('viewerContent').innerHTML = '';
         }
 
-        // Download Book File
         function downloadBookFile(id) {
             const book = books.find(b => b.id === id);
             if (!book || !book.fileData) {
@@ -585,7 +783,6 @@
             showToast(`Downloading "${book.title}"...`);
         }
 
-        // Delete Book
         function deleteBook(id) {
             const book = books.find(b => b.id === id);
             if (!book) return;
@@ -596,7 +793,6 @@
             showToast(`Deleted "${book.title}" from library.`);
         }
 
-        // Upload Form Handler
         async function handleFormUpload(e) {
             e.preventDefault();
 
@@ -616,7 +812,6 @@
                 }
             }
 
-            // Book file handling
             const bookFileInput = document.getElementById('bookFile').files[0];
             if (!bookFileInput) {
                 showToast('Please attach a PDF or TXT book document.', 'error');
@@ -645,7 +840,6 @@
             showToast(`Successfully uploaded "${title}" to archive!`);
         }
 
-        // Utility: Convert File to Base64
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -655,7 +849,6 @@
             });
         }
 
-        // Toggle Cover Input Types
         function toggleCoverInput() {
             const coverType = document.getElementById('coverType').value;
             if (coverType === 'url') {
@@ -667,7 +860,6 @@
             }
         }
 
-        // Modal Controls
         function openUploadModal() {
             document.getElementById('uploadModal').classList.remove('hidden');
         }
@@ -676,7 +868,6 @@
             document.getElementById('uploadModal').classList.add('hidden');
         }
 
-        // Toast Feedback System
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
@@ -698,7 +889,6 @@
             }, 3500);
         }
 
-        // HTML Escaper Guard
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
